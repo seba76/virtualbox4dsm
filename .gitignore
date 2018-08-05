@@ -1,3 +1,9 @@
 *.ko
 *.dep
 repack.sh
+*.vbox-extpack
+*.zip
+*.run
+.config
+package/www/phpvirtualbox/
+

@@ -96,7 +96,9 @@ InstallSynologyConfig(){
 }
 
 MakePackage() {
-    source /pkgscripts/include/pkg_util.sh
+	[ -f /pkgscripts/include/pkg_util.sh ] && source /pkgscripts/include/pkg_util.sh
+	[ -f /pkgscripts-ng/include/pkg_util.sh ] && source /pkgscripts-ng/include/pkg_util.sh
+    
 
     ### fix permissions
     chown root:root $PKG_DIR/* -R

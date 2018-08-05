@@ -1,7 +1,8 @@
 # INFO.sh
-. /pkgscripts/include/pkg_util.sh
+[ -f /pkgscripts/include/pkg_util.sh ] && . /pkgscripts/include/pkg_util.sh
+[ -f /pkgscripts-ng/include/pkg_util.sh ] && . /pkgscripts-ng/include/pkg_util.sh
 package="virtualbox"
-version="5.1.28-117968"
+version="5.2.16-123759"
 displayname="VirtualBox"
 maintainer="seba"
 maintainer_url="http://github.com/seba76/virtualbox/"
