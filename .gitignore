@@ -1,2 +1,3 @@
 *.ko
 *.dep
+repack.sh
