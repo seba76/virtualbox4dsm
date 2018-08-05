@@ -11,7 +11,6 @@ esac
 # url links and file names
 . ./.config
 
-
 # check req files
 if [ ! -f ./${VirtualBoxFile} ]; then
 	echo "Missing ${VirtualBoxFile}"
@@ -83,4 +82,4 @@ fi
 touch  /logs/virtualbox.build
 cd ./package/opt/VirtualBox/src/vboxhost/
 #make ${MAKE_FLAGS} KERN_DIR=/source/${SYNO_KERNEL_SOURCE_DIR}/ ARCH=${ARCH} CROSS_COMPILE= 
-make ${MAKE_FLAGS} KSRC="$KSRC" CROSS_COMPILE="$CROSS_COMPILE" ARCH="$ARCH" KERN_DIR="$KSRC"
+make ${MAKE_FLAGS} KSRC="$KSRC" CROSS_COMPILE="$CROSS_COMPILE" ARCH="$ARCH" KERN_DIR="$KSRC" KERN_VER=3.10.x
