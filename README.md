@@ -1,7 +1,7 @@
 # VirtualBox for Synology DSM
 
 This is build for VirtualBox service running on Synology NAS boxes running appropriate Intel CPU. You 
-should be able to build package on your NAS using this repo. However you can also use any Linux box also.
+should be able to build package on your NAS using this repo or you can use Linux box like debian or ubuntu.
 
 ## How To Build
 
