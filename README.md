@@ -5,9 +5,15 @@ should be able to build pacakge on your NAS using this repo. However you can als
 
 How To Build
 
- - Clone or download this repo
- - Clone or download repo from https://github.com/SynologyOpenSource/pkgscripts-ng
- - run ./prep_build.sh
+ - mkdir toolkit
+ - cd toolkit
+ - git clone https://github.com/SynologyOpenSource/pkgscripts-ng.git
+ - sudo ./pkgscripts-ng/EnvDeploy -v 6.1 -p bromolow
+ - mkdir source
+ - cd source
+ - git clone https://github.com/seba76/virtualbox.git
+ - cd virtualbox
+ - ./prep_build.sh
  - 
 
 TODO:

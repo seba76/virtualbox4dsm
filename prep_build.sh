@@ -1,14 +1,14 @@
-#!/bin/sh
-VirtualBoxVersion=5.1.28-117968
-VirtualBoxBase=http://download.virtualbox.org/virtualbox/5.1.28/
+#!/bin/sh 
+VirtualBoxVersion=5.2.16-123759
+VirtualBoxBase=http://download.virtualbox.org/virtualbox/5.2.16/
 VirtualBoxFile=VirtualBox-${VirtualBoxVersion}-Linux_amd64.run
 ExtensionPackFile=Oracle_VM_VirtualBox_Extension_Pack-${VirtualBoxVersion}.vbox-extpack
-PhpVirtualBoxFile=phpVirtualBox-5.0.5.zip
+PhpVirtualBoxFile=5.2-0.zip
 
 # If files don't exist they need to be downloaded
 VirtualBoxUrl=${VirtualBoxBase}${VirtualBoxFile}
 ExtensionPackUrl=${VirtualBoxBase}${ExtensionPackFile}
-PhpVirtualBoxUrl=http://sourceforge.net/projects/phpvirtualbox/files/latest/download
+PhpVirtualBoxUrl=https://github.com/phpvirtualbox/phpvirtualbox/archive/5.2-0.zip
 
 if [ ! -f ./${VirtualBoxFile} ]; then
 	echo "Downloading ${VirtualBoxFile}"
