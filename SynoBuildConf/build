@@ -1,0 +1,86 @@
+#!/bin/bash
+
+touch /logs/virtualbox.build
+
+# if env MakeClean is set to yes clean
+case ${MakeClean} in
+	[Yy][Ee][Ss])
+	;;
+esac
+
+# url links and file names
+. ./.config
+
+
+# check req files
+if [ ! -f ./${VirtualBoxFile} ]; then
+	echo "Missing ${VirtualBoxFile}"
+	exit 1
+fi
+
+if [ ! -f ./${ExtensionPackFile} ]; then
+	echo "Missing ${ExtensionPackFile}"
+	exit 1
+fi
+
+# unpack virtualbox 
+echo "Unpacking ${VirtualBoxFile}"
+./${VirtualBoxFile} --noexec --target /tmp/vb
+if [ ! -d ./package/opt/VirtualBox ]; then
+    echo "Creating ./package/opt/VirtualBox"
+    mkdir -p  ./package/opt/VirtualBox
+else
+    echo "Clean ./package/opt/VirtualBox"
+    rm -rf ./package/opt/VirtualBox/*
+fi
+
+tar jxf /tmp/vb/VirtualBox.tar.bz2 -C ./package/opt/VirtualBox
+rm -r /tmp/vb
+
+echo "Unpacking ${ExtensionPackFile}"
+mkdir -p ./package/opt/VirtualBox/ExtensionPacks/Oracle_VM_VirtualBox_Extension_Pack
+tar xf ./${ExtensionPackFile} -C ./package/opt/VirtualBox/ExtensionPacks/Oracle_VM_VirtualBox_Extension_Pack
+
+# to build drivers we need kernal source, pass location in KERN_DIR variable
+if [ ! -d /source/${SYNO_KERNEL_SOURCE_DIR}/ ]; then
+	echo "Missing kernel source"
+	exit 1
+fi
+
+if [ ! -f /source/${SYNO_KERNEL_SOURCE_DIR}/Module.symvers ]; then
+	echo "Kernel modules are not built"
+        if [ ! -f /source/${SYNO_KERNEL_SOURCE_DIR}/.config ]; then
+                case "$BUILD_TARGET" in
+                        PPC_QORIQ)
+                                echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/ppcQorIQ"
+                                cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/ppcQorIQ    /source/${SYNO_KERNEL_SOURCE_DIR}/.config
+                                ;;
+                        X64)
+                                echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/x86_64"
+                                cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/x86_64      /source/${SYNO_KERNEL_SOURCE_DIR}/.config
+                                ;;
+                        BROMOLOWESM|BROMOLOW)
+                                echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/bromolow"
+                                cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/bromolow    /source/${SYNO_KERNEL_SOURCE_DIR}/.config
+                                ;;
+                        MARVELL_88F6281)
+                                echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/88f6281"
+                                cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/88f6281     /source/${SYNO_KERNEL_SOURCE_DIR}/.config
+                                ;;
+                        *)
+                                echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/${PLATFORM_ABBR} for $BUILD_TARGET"
+                                cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/$PLATFORM_ABBR /source/${SYNO_KERNEL_SOURCE_DIR}/.config
+                                ;;
+                esac
+        fi
+	echo "Entering /source/${SYNO_KERNEL_SOURCE_DIR}/"
+	cd /source/${SYNO_KERNEL_SOURCE_DIR}/
+	echo "Building modules"
+	make ${MAKE_FLAGS}  ARCH=${ARCH} CROSS_COMPILE="$CROSS_COMPILE"  modules_prepare
+	cd /source/virtualbox
+fi
+
+touch  /logs/virtualbox.build
+cd ./package/opt/VirtualBox/src/vboxhost/
+#make ${MAKE_FLAGS} KERN_DIR=/source/${SYNO_KERNEL_SOURCE_DIR}/ ARCH=${ARCH} CROSS_COMPILE= 
+make ${MAKE_FLAGS} KSRC="$KSRC" CROSS_COMPILE="$CROSS_COMPILE" ARCH="$ARCH" KERN_DIR="$KSRC"

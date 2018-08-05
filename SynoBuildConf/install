@@ -1,0 +1,116 @@
+#!/bin/bash
+
+PKG_NAME="virtualbox"
+INST_DIR="/tmp/_${PKG_NAME}"
+PKG_DIR="/tmp/_${PKG_NAME}_pkg"
+PKG_DEST="/image/packages"
+DATE=$(date +%Y%m%d) 
+SRC=$(pwd)
+
+PrepareDirs() {
+    for dir in $INST_DIR $PKG_DIR; do
+        rm -rf "$dir"
+    done
+    for dir in $INST_DIR $PKG_DIR $PKG_DEST; do
+        mkdir -p "$dir"
+    done
+}
+
+Install() {
+	if [ ! -f  ./package/opt/VirtualBox/src/vboxhost/vboxdrv.ko ]; then
+		echo "Modules not built!"
+		exit 1
+	fi
+
+	### what platform is this
+	case "$BUILD_TARGET" in
+		PPC_QORIQ)
+				echo "PPC_QORIQ is unsupported platform!"
+				exit 1
+				;;
+			X64)
+				PLATFORM="x86_64"
+				;;
+			BROMOLOWESM|BROMOLOW)
+				PLATFORM="bromolow"
+				;;
+			MARVELL_88F6281)
+				echo "MARVELL_88F6281 is unsupported platform!"
+				exit 1
+				;;
+			*)
+				echo "${BUILD_TARGET} unsupported platform!"
+				exit 1
+				;;
+	esac
+	 
+	### what kernel version is this
+	case "${DSM_SHLIB_MAJOR}.${DSM_SHLIB_MINOR}" in
+		5.1)
+			KERNEL="3.2.40"
+			;;
+		5.2)
+			KERNEL="3.10.35"
+			;;
+		6.0)
+			KERNEL="3.10.77"
+			;;
+		6.1)
+			KERNEL="3.10.102"
+			;;
+		*)
+			echo "${DSM_SHLIB_MAJOR}.${DSM_SHLIB_MINOR} unknown verion of DSM, can't guess kernel version"
+			exit 1
+			;;
+	esac
+	
+	### update drivers for this version
+	echo "Update drivers in ./package/drivers/${PLATFORM}/${KERNEL}/ with ./package/opt/VirtualBox/src/vboxhost/*.ko"
+	cp -f package/opt/VirtualBox/src/vboxhost/*.ko package/drivers/${PLATFORM}/${KERNEL}/
+	cp -r package/* "${INST_DIR}/"
+
+	# fix permissions
+	chown root:root ${INST_DIR} -R
+
+	# remove some files to lighten installer
+	rm -rf "${INST_DIR}/opt/VirtualBox/src"
+	rm -f "${INST_DIR}/opt/VirtualBox/UserManual.pdf"
+	rm -f "${INST_DIR}/opt/VirtualBox/VirtualBox.chm"
+	rm -f "${INST_DIR}/opt/VirtualBox/webtest"
+}
+
+GenerateINFO() {
+    ### Generate INFO file
+    ./INFO.sh "${DSM_SHLIB_MAJOR}.${DSM_SHLIB_MINOR}-${DSM_BUILD_NUM}" "${DATE}" > spk/INFO
+    #./INFO.sh > spk/INFO
+    cp spk/INFO "${PKG_DIR}"
+    cp spk/INFO INFO
+}
+
+InstallSynologyConfig(){
+    ### Copy licence
+    cp -av spk/LICENSE "${PKG_DIR}"
+    cp -r spk/scripts/ "${PKG_DIR}"
+    cp spk/PACKAGE_ICON{,_256}.PNG "${PKG_DIR}"
+    cp -r spk/WIZARD_UIFILES/ "${PKG_DIR}"
+}
+
+MakePackage() {
+    source /pkgscripts/include/pkg_util.sh
+
+    ### fix permissions
+    chown root:root $PKG_DIR/* -R
+
+    pkg_make_package $INST_DIR $PKG_DIR
+    pkg_make_spk $PKG_DIR $PKG_DEST
+}
+
+main() {
+    PrepareDirs
+    Install
+    GenerateINFO
+    InstallSynologyConfig
+    MakePackage 
+}
+
+main "$@"

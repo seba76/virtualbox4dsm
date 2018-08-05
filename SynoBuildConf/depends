@@ -1,0 +1,13 @@
+# SynoBuildConf/depends
+
+[BuildDependent]
+# each line here is a dependent project
+
+[ReferenceOnly]
+# each line here is a project for reference only but no need to be built
+
+[5.2]
+all="5.2"
+
+[default]
+all="6.1" 
