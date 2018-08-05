@@ -1,0 +1,137 @@
+#!/bin/sh
+
+[ -f /etc/vbox/vbox.cfg ] && . /etc/vbox/vbox.cfg
+
+if [ -z "$SYNOPKG_PKGNAME" ]; then
+    PACKAGE_NAME="virtualbox"
+    PACKAGE_VER=`get_key_value "/var/packages/${PACKAGE_NAME}/INFO" "version"`
+else
+    PACKAGE_NAME=$SYNOPKG_PKGNAME
+    PACKAGE_VER=$SYNOPKG_PKGVER
+fi
+
+SCRIPTLOG="$TARGET_DIR/share/scripts.log"
+PIDFILE="/var/packages/virtualbox/target/wolsvc.pid"
+WOL="/var/packages/virtualbox/enabled_wol"
+
+
+DSM_CONFIG="/etc.defaults/synoinfo.conf"
+PACKAGE_DIR="/var/packages/$PACKAGE_NAME"
+TARGET_DIR="$PACKAGE_DIR/target"
+PACKAGE_ENABLED="${PACKAGE_DIR}/enabled"
+
+NGINX_CONF_FOLDER="/usr/local/etc/nginx/conf.d"
+PHOTO_NGINX_DISABLED_CONF="www.PhotoStation.disabled.conf"
+PHOTO_NGINX_CONF="www.PhotoStation.conf"
+
+insert_nginx_conf()
+{
+	cp -f $TARGET_DIR/etc/SYNO.SDS.PhotoStation/$PHOTO_NGINX_CONF $NGINX_CONF_FOLDER/
+
+	grep_result=`/usr/bin/grep pingpong\.php /etc/nginx/nginx.conf`
+	if [ -z "$grep_result" ]; then  # pingpong.php rule not found in nginx conf, insert it
+		cp -f $TARGET_DIR/etc/SYNO.SDS.PhotoStation/$PHOTO_NGINX_PINGPONG_CONF $NGINX_CONF_FOLDER/
+	fi
+}
+
+remove_nginx_conf()
+{
+	rm -f $NGINX_CONF_FOLDER/$PHOTO_NGINX_CONF
+
+	if [ -f "$NGINX_CONF_FOLDER/$PHOTO_NGINX_PINGPONG_CONF" ]; then
+		rm -f $NGINX_CONF_FOLDER/$PHOTO_NGINX_PINGPONG_CONF
+	fi
+
+	cp -f $TARGET_DIR/etc/SYNO.SDS.PhotoStation/$PHOTO_NGINX_DISABLED_CONF $NGINX_CONF_FOLDER/
+}
+
+insert_nginx_conf()
+{
+	rm -f $NGINX_CONF_FOLDER/$PHOTO_NGINX_DISABLED_CONF
+
+	cp -f $TARGET_DIR/etc/SYNO.SDS.PhotoStation/$PHOTO_NGINX_CONF $NGINX_CONF_FOLDER/
+
+	grep_result=`/usr/bin/grep pingpong\.php /etc/nginx/nginx.conf`
+	if [ -z "$grep_result" ]; then  # pingpong.php rule not found in nginx conf, insert it
+		cp -f $TARGET_DIR/etc/SYNO.SDS.PhotoStation/$PHOTO_NGINX_PINGPONG_CONF $NGINX_CONF_FOLDER/
+	fi
+}
+
+start()
+{
+		# after DSM upgrade opt folder is missing, fix it
+		if [ ! -d /opt/VirtualBox ]; then
+				[ ! -d /opt ] && mkdir /opt
+				cp -r $TARGET_DIR/opt/* /opt/
+		fi
+
+		# copy conf from share
+		if [ -d $TARGET_DIR/share/.config ]; then
+			cp -rf $TARGET_DIR/share/.config ${HOME}'
+		fi
+
+		# start services
+		"$TARGET_DIR/scripts/vboxdrv.sh" start > "${SCRIPTLOG}" 2>&1
+		"$TARGET_DIR/scripts/vboxweb-service.sh" start >> "${SCRIPTLOG}" 2>&1
+		"$TARGET_DIR/scripts/vboxinit.sh" start >> "${SCRIPTLOG}" 2>&1
+		"$TARGET_DIR/scripts/vbox-usb.sh" start >> "${SCRIPTLOG}" 2>&1
+		"$TARGET_DIR/scripts/wol.sh" start >> "${SCRIPTLOG}" 2>&1
+		
+		insert_nginx_conf
+}
+
+stop()
+{
+	# stop services, we will let vboxdrv shutdown VM's based on vbox.cfg
+	"$TARGET_DIR/scripts/wol.sh" stop >> "${SCRIPTLOG}" 2>&1
+	"$TARGET_DIR/scripts/vboxinit.sh" stop >> "${SCRIPTLOG}" 2>&1
+	"$TARGET_DIR/scripts/vboxweb-service.sh" stop >> "${SCRIPTLOG}" 2>&1
+	"$TARGET_DIR/scripts/vbox-usb.sh" stop >> "${SCRIPTLOG}" 2>&1
+	"$TARGET_DIR/scripts/vboxdrv.sh" stop >> "${SCRIPTLOG}" 2>&1
+
+	# copy config to share
+	if [ -d /var/packages/virtualbox/target/share/ ]; then
+		cp -rf "${HOME}"/.config $TARGET_DIR/share/
+	fi
+	
+	remove_nginx_conf
+}
+
+case $1 in
+   	start)
+		# check enabled
+		if [ ! -f "${PACKAGE_DIR}/enabled" ]; then
+			exit 0;
+		fi
+
+		# start routine
+		start
+		exit 0
+        ;;
+   	stop)
+		stop
+       	exit 0
+        ;;
+	restart)
+		stop && start
+	;;
+  	status)
+		if [ -e "/usr/syno/synoman/webman/3rdparty/${PACKAGE_NAME}" ]; then
+			exit 0
+		else
+			exit 1
+		fi
+        ;;
+	killall)
+		stop
+		exit 0
+        ;;
+	log)
+		echo "$TARGET_DIR/share/vbox.log"
+       	exit 0
+        ;;
+   	*)
+		echo "Usage: start-stop-status.sh start|stop|restart|status|killall|log"
+       	exit 1
+        ;;
+esac

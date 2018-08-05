@@ -1,0 +1,12 @@
+{
+  ".url": {
+    "com.seba.virtualbox": {
+      "type": "legacy",
+      "allUsers": true,
+      "title": "Virtualbox",
+      "desc": "",
+      "icon": "images/Virtualbox_{0}.png",
+      "url": "/webman/3rdparty/virtualbox/phpvirtualbox/index.php"
+    }
+  }
+}
