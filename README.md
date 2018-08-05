@@ -3,6 +3,8 @@
 This is build for VirtualBox service running on Synology NAS boxes running appropriate Intel CPU. You 
 should be able to build package on your NAS using this repo or you can use Linux box like debian or ubuntu.
 
+Keep in mind installing this package can make your NAS unreachable since it is still in alpha phase.
+
 ## How To Build
 
 Assuming we are building for bromolow platform and DSM version 6.1 following commands need to be executed.
@@ -47,3 +49,6 @@ If not check log.build and log.install in build_env/ds.bromolow-6.1/ folder to s
 
 ## ToDo
 - Describe process for other platforms
+- Describe prerequisits
+- Describe known bugs and warnings
+- License
