@@ -33,7 +33,9 @@ fi
 if [ "${WEBSVC_BIND}" == "0.0.0.0" ]; then
   WEBSVC_URL="${WEBSVC_PROTOCOL}://127.0.0.1:18083"
 fi
+
 WOL_SVC=$([ "${wizard_enable_wol}" == "true" ]  && echo "true" || echo "false")
+INTEGRATE=$([ "${wizard_integrate}" == "true" ]  && echo "true" || echo "false")
 
 # get dynamic stuff
 VOL_PATH=$(servicetool --get-alive-volume)
@@ -54,7 +56,6 @@ preinst ()
 postinst ()
 {
 	#create shared folder if needed
-	echo "Create shared folder if needed"
 	synoshare --get ${SHARE_NAME} > /dev/null 2>&1
 	if [ $? -ne 0 ]
 	then
@@ -98,19 +99,24 @@ postinst ()
 	# Link package dir to install dir
 	ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
-	# Install the phpVirtualBox web interface
-#	echo "Install the phpVirtualBox onto web station"
-#	mkdir -p ${WEB_DIR}/phpvirtualbox
-#	cp -pR ${INSTALL_DIR}/www/phpvirtualbox ${WEB_DIR}/
+	if [ "${INTEGRATE}" == "false" ]; then
+		# Install the phpVirtualBox web interface in web station
+		mkdir -p ${WEB_DIR}/phpvirtualbox
+		cp -pR ${INSTALL_DIR}/www/phpvirtualbox ${WEB_DIR}/
 
-#	if [ $? -ne 0 ]; then
-#		echo "Unable to install phpwirtualbox"
-#		exit 1
-#	fi
+		if [ $? -ne 0 ]; then
+			echo "Unable to install phpwirtualbox"
+			exit 1
+		fi
+	fi
 	
 	# Create a default configuration file for phpVirtualBox
-	#CONFIG_PHP="${WEB_DIR}/phpvirtualbox/config.php"
-	CONFIG_PHP="${INSTALL_DIR}/www/phpvirtualbox/config.php"
+	if [ "${INTEGRATE}" == "false" ]; then
+		CONFIG_PHP="${WEB_DIR}/phpvirtualbox/config.php"
+	else
+		CONFIG_PHP="${INSTALL_DIR}/www/phpvirtualbox/config.php"
+	fi
+	
 	if [ ! -f "${CONFIG_PHP}" ]; then
 		cp "${INSTALL_DIR}/www/config.php.synology" "${CONFIG_PHP}"
 		sed -i -e "s|@user@|${VBOX_USER:=}|g" "${CONFIG_PHP}"
@@ -125,7 +131,6 @@ postinst ()
 	fi
 
    	# Install vbox to /opt/VirtualBox
-   	echo "Install vbox to /opt/VirtualBox"
 	[ ! -d /opt ] && mkdir /opt
 	cp -pR "${INSTALL_DIR}/opt/VirtualBox" /opt/VirtualBox
 
@@ -183,17 +188,17 @@ postinst ()
 	fi
 		
 	# Install service definition
-	echo "Install service definition"
 	/usr/syno/bin/servicetool --install-configure-file --package /var/packages/virtualbox/target/virtualbox.sc
 
 	# set default vm machine folder to share
-	echo "set default vm machine folder to ${VOL_PATH}/${SHARE_NAME}"
+	# set default vm machine folder to ${VOL_PATH}/${SHARE_NAME}"
 	/opt/VirtualBox/VBoxManage setproperty machinefolder ${VOL_PATH}/${SHARE_NAME}
 
 	# move additions iso to share
-	echo "move additions iso to share"
-	cp -R /opt/VirtualBox/additions ${VOL_PATH}/${SHARE_NAME}
-	rm -rf /opt/VirtualBox/additions
+	if [ -d /opt/VirtualBox/additions ]; then
+		cp -R  ${VOL_PATH}/${SHARE_NAME}
+		rm -rf /opt/VirtualBox/additions
+	fi
 	
 	exit 0
 }
