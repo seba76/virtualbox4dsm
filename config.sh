@@ -4,7 +4,6 @@ VirtualBoxBase=http://download.virtualbox.org/virtualbox/5.2.16/
 VirtualBoxFile=VirtualBox-${VirtualBoxVersion}-Linux_amd64.run
 ExtensionPackFile=Oracle_VM_VirtualBox_Extension_Pack-${VirtualBoxVersion}.vbox-extpack
 PhpVirtualBoxFile=5.2-0.zip
-KernelTar=https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/15152branch/bromolow-source/linux-3.10.x.txz/download
 
 # If files don't exist they need to be downloaded
 VirtualBoxUrl=${VirtualBoxBase}${VirtualBoxFile}
@@ -21,6 +20,32 @@ fi
 if [ "$UNZIP" == "" ]; then
   UNZIP="./unzip"
 fi
+
+function prompt_for_source()
+{
+	PS3='Please enter your choice: '
+	options=("Bromolow DSM 6.1 (15152)" "Bromolow DSM 6.2 (22259)" "Quit")
+	select opt in "${options[@]}"
+	do
+		case $opt in
+			"Bromolow DSM 6.1 (15152)")
+				echo "Setting kernel download link for branch 15152, bromolow platform"
+				KernelTar=https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/15152branch/bromolow-source/linux-3.10.x.txz/download
+				break
+				;;
+			"Bromolow DSM 6.2 (22259)")
+				echo "Setting kernel download link for branch 22259, bromolow platform"
+				KernelTar=https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/22259branch/bromolow-source/linux-3.10.x.txz/download
+				break
+				;;
+			"Quit")
+				exit 1
+				break
+				;;
+			*) echo "invalid option $REPLY";;
+		esac
+	done
+}
 
 function download_vbox()
 {
@@ -97,6 +122,7 @@ function update_vboxcfg()
 
 case $1 in
   prep)
+    prompt_for_source
     download_vbox
     download_phpvbox
     download_linux

@@ -21,39 +21,30 @@ TARGET_DIR="$PACKAGE_DIR/target"
 PACKAGE_ENABLED="${PACKAGE_DIR}/enabled"
 
 NGINX_CONF_FOLDER="/usr/local/etc/nginx/conf.d"
-PHOTO_NGINX_DISABLED_CONF="www.PhotoStation.disabled.conf"
-PHOTO_NGINX_CONF="www.PhotoStation.conf"
-
-insert_nginx_conf()
-{
-	cp -f $TARGET_DIR/etc/SYNO.SDS.PhotoStation/$PHOTO_NGINX_CONF $NGINX_CONF_FOLDER/
-
-	grep_result=`/usr/bin/grep pingpong\.php /etc/nginx/nginx.conf`
-	if [ -z "$grep_result" ]; then  # pingpong.php rule not found in nginx conf, insert it
-		cp -f $TARGET_DIR/etc/SYNO.SDS.PhotoStation/$PHOTO_NGINX_PINGPONG_CONF $NGINX_CONF_FOLDER/
-	fi
-}
+VBOX_NGINX_DISABLED_CONF="SYNO.SDS.virtualbox.disabled.conf"
+VBOX_NGINX_CONF="SYNO.SDS.virtualbox.conf"
+VBOX_NGINX_PINGPONG_CONF=""
 
 remove_nginx_conf()
 {
-	rm -f $NGINX_CONF_FOLDER/$PHOTO_NGINX_CONF
+	rm -f $NGINX_CONF_FOLDER/$VBOX_NGINX_CONF
 
-	if [ -f "$NGINX_CONF_FOLDER/$PHOTO_NGINX_PINGPONG_CONF" ]; then
-		rm -f $NGINX_CONF_FOLDER/$PHOTO_NGINX_PINGPONG_CONF
+	if [ -f "$NGINX_CONF_FOLDER/$VBOX_NGINX_PINGPONG_CONF" ]; then
+		rm -f $NGINX_CONF_FOLDER/$VBOX_NGINX_PINGPONG_CONF
 	fi
 
-	cp -f $TARGET_DIR/etc/SYNO.SDS.PhotoStation/$PHOTO_NGINX_DISABLED_CONF $NGINX_CONF_FOLDER/
+	cp -f $TARGET_DIR/etc/fpm.d/$VBOX_NGINX_DISABLED_CONF $NGINX_CONF_FOLDER/
 }
 
 insert_nginx_conf()
 {
-	rm -f $NGINX_CONF_FOLDER/$PHOTO_NGINX_DISABLED_CONF
+	rm -f $NGINX_CONF_FOLDER/$VBOX_NGINX_DISABLED_CONF
 
-	cp -f $TARGET_DIR/etc/SYNO.SDS.PhotoStation/$PHOTO_NGINX_CONF $NGINX_CONF_FOLDER/
+	cp -f $TARGET_DIR/etc/fpm.d/$VBOX_NGINX_CONF $NGINX_CONF_FOLDER/
 
 	grep_result=`/usr/bin/grep pingpong\.php /etc/nginx/nginx.conf`
 	if [ -z "$grep_result" ]; then  # pingpong.php rule not found in nginx conf, insert it
-		cp -f $TARGET_DIR/etc/SYNO.SDS.PhotoStation/$PHOTO_NGINX_PINGPONG_CONF $NGINX_CONF_FOLDER/
+		cp -f $TARGET_DIR/etc/fpm.d/$VBOX_NGINX_PINGPONG_CONF $NGINX_CONF_FOLDER/
 	fi
 }
 
@@ -67,17 +58,21 @@ start()
 
 		# copy conf from share
 		if [ -d $TARGET_DIR/share/.config ]; then
-			cp -rf $TARGET_DIR/share/.config ${HOME}'
+			cp -rf $TARGET_DIR/share/.config ${HOME}
 		fi
 
-		# start services
+		# load drivers
 		"$TARGET_DIR/scripts/vboxdrv.sh" start > "${SCRIPTLOG}" 2>&1
+		# start vbox SOAP Service
 		"$TARGET_DIR/scripts/vboxweb-service.sh" start >> "${SCRIPTLOG}" 2>&1
+		# start VM's
 		"$TARGET_DIR/scripts/vboxinit.sh" start >> "${SCRIPTLOG}" 2>&1
+		# exec USB fix
 		"$TARGET_DIR/scripts/vbox-usb.sh" start >> "${SCRIPTLOG}" 2>&1
+		# start WOL service
 		"$TARGET_DIR/scripts/wol.sh" start >> "${SCRIPTLOG}" 2>&1
-		
-		insert_nginx_conf
+		# insert nginx config, this integrates app in DSM
+		#insert_nginx_conf
 }
 
 stop()
