@@ -50,39 +50,54 @@ insert_nginx_conf()
 
 start()
 {
-		echo "**** Start at $(date) ****" >> "${SCRIPTLOG}" 2>&1
-		# after DSM upgrade opt folder is missing, fix it
-		if [ ! -d /opt/VirtualBox ]; then
-				[ ! -d /opt ] && mkdir /opt
-				cp -r $TARGET_DIR/opt/* /opt/
-		fi
+	echo "**** Start at $(date) ****" >> "${SCRIPTLOG}" 2>&1
+	# after DSM upgrade opt folder is missing, fix it
+	if [ ! -d /opt/VirtualBox ]; then
+			[ ! -d /opt ] && mkdir /opt
+			cp -r $TARGET_DIR/opt/* /opt/
+	fi
 
-		# copy conf from share
-		if [ -d $TARGET_DIR/share/.config ]; then
-			cp -rf $TARGET_DIR/share/.config ${HOME}
-		fi
+	# copy conf from share
+	if [ -d $TARGET_DIR/share/.config ]; then
+		cp -rf $TARGET_DIR/share/.config ${HOME}
+	fi
 
-		# load drivers
-		"$TARGET_DIR/scripts/vboxdrv.sh" start >> "${SCRIPTLOG}" 2>&1
-		# start vbox SOAP Service
-		"$TARGET_DIR/scripts/vboxweb-service.sh" start >> "${SCRIPTLOG}" 2>&1
-		# start VM's
-		"$TARGET_DIR/scripts/vboxinit.sh" start >> "${SCRIPTLOG}" 2>&1
-		# exec USB fix
-		"$TARGET_DIR/scripts/vbox-usb.sh" start >> "${SCRIPTLOG}" 2>&1
-		# start WOL service
-		"$TARGET_DIR/scripts/wol.sh" start >> "${SCRIPTLOG}" 2>&1
-		# insert nginx config, this integrates app in DSM
-		#insert_nginx_conf
+	# load drivers
+	"$TARGET_DIR/scripts/vboxdrv.sh" start >> "${SCRIPTLOG}" 2>&1
+	# start vbox SOAP Service
+	"$TARGET_DIR/scripts/vboxweb-service.sh" start >> "${SCRIPTLOG}" 2>&1
+	# start VM's
+	"$TARGET_DIR/scripts/vboxinit.sh" start >> "${SCRIPTLOG}" 2>&1
+	# exec USB fix
+	"$TARGET_DIR/scripts/vbox-usb.sh" start >> "${SCRIPTLOG}" 2>&1
+	# start WOL service
+	"$TARGET_DIR/scripts/wol.sh" start >> "${SCRIPTLOG}" 2>&1
+	# insert nginx config, this integrates app in DSM
+	#insert_nginx_conf
+	echo "**** Start finished at $(date) ****" >> "${SCRIPTLOG}" 2>&1
 }
 
 stop()
 {
+	echo "**** Stop at $(date) ****" >> "${SCRIPTLOG}" 2>&1
 	# stop services, we will let vboxdrv shutdown VM's based on vbox.cfg
+
+	# remove nginx config
+	#remove_nginx_conf
+
+	# stop WOL service
 	"$TARGET_DIR/scripts/wol.sh" stop >> "${SCRIPTLOG}" 2>&1
+	
+	# stop VM's
 	"$TARGET_DIR/scripts/vboxinit.sh" stop >> "${SCRIPTLOG}" 2>&1
+	
+	# stop vbox SOAP service
 	"$TARGET_DIR/scripts/vboxweb-service.sh" stop >> "${SCRIPTLOG}" 2>&1
+	
+	# stop USB fix
 	"$TARGET_DIR/scripts/vbox-usb.sh" stop >> "${SCRIPTLOG}" 2>&1
+	
+	# unload drivers
 	"$TARGET_DIR/scripts/vboxdrv.sh" stop >> "${SCRIPTLOG}" 2>&1
 
 	# copy config to share
@@ -90,9 +105,7 @@ stop()
 		cp -rf "${HOME}"/.config $TARGET_DIR/share/
 	fi
 	
-	remove_nginx_conf
-
-	echo "**** End at $(date) ****" >> "${SCRIPTLOG}" 2>&1
+	echo "**** Stop finished at $(date) ****" >> "${SCRIPTLOG}" 2>&1
 }
 
 case $1 in
