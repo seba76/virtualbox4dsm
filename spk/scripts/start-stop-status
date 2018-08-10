@@ -10,7 +10,6 @@ else
     PACKAGE_VER=$SYNOPKG_PKGVER
 fi
 
-SCRIPTLOG="$TARGET_DIR/share/scripts.log"
 PIDFILE="/var/packages/virtualbox/target/wolsvc.pid"
 WOL="/var/packages/virtualbox/enabled_wol"
 
@@ -19,6 +18,7 @@ DSM_CONFIG="/etc.defaults/synoinfo.conf"
 PACKAGE_DIR="/var/packages/$PACKAGE_NAME"
 TARGET_DIR="$PACKAGE_DIR/target"
 PACKAGE_ENABLED="${PACKAGE_DIR}/enabled"
+SCRIPTLOG="$TARGET_DIR/share/scripts.log"
 
 NGINX_CONF_FOLDER="/usr/local/etc/nginx/conf.d"
 VBOX_NGINX_DISABLED_CONF="SYNO.SDS.virtualbox.disabled.conf"
@@ -50,6 +50,7 @@ insert_nginx_conf()
 
 start()
 {
+		echo "**** Start at $(date) ****" start >> "${SCRIPTLOG}" 2>&1
 		# after DSM upgrade opt folder is missing, fix it
 		if [ ! -d /opt/VirtualBox ]; then
 				[ ! -d /opt ] && mkdir /opt
@@ -62,7 +63,7 @@ start()
 		fi
 
 		# load drivers
-		"$TARGET_DIR/scripts/vboxdrv.sh" start > "${SCRIPTLOG}" 2>&1
+		"$TARGET_DIR/scripts/vboxdrv.sh" start >> "${SCRIPTLOG}" 2>&1
 		# start vbox SOAP Service
 		"$TARGET_DIR/scripts/vboxweb-service.sh" start >> "${SCRIPTLOG}" 2>&1
 		# start VM's
@@ -90,6 +91,8 @@ stop()
 	fi
 	
 	remove_nginx_conf
+
+	echo "**** End at $(date) ****" start >> "${SCRIPTLOG}" 2>&1
 }
 
 case $1 in
