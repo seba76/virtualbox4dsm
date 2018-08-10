@@ -50,7 +50,7 @@ insert_nginx_conf()
 
 start()
 {
-		echo "**** Start at $(date) ****" start >> "${SCRIPTLOG}" 2>&1
+		echo "**** Start at $(date) ****" >> "${SCRIPTLOG}" 2>&1
 		# after DSM upgrade opt folder is missing, fix it
 		if [ ! -d /opt/VirtualBox ]; then
 				[ ! -d /opt ] && mkdir /opt
@@ -92,7 +92,7 @@ stop()
 	
 	remove_nginx_conf
 
-	echo "**** End at $(date) ****" start >> "${SCRIPTLOG}" 2>&1
+	echo "**** End at $(date) ****" >> "${SCRIPTLOG}" 2>&1
 }
 
 case $1 in
