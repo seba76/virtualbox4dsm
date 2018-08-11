@@ -9,5 +9,8 @@
 			}
 		]
 	},
-	"service-cfg":{}
+	"service-cfg":{},
+	"port-config": {
+		"protocol-file": "etc/virtualbox.sc"
+	}
 }
