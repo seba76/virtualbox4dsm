@@ -69,7 +69,7 @@ start()
 	# start VM's
 	"$TARGET_DIR/scripts/vboxinit.sh" start >> "${SCRIPTLOG}" 2>&1
 	# exec USB fix
-	"$TARGET_DIR/scripts/vbox-usb.sh" start >> "${SCRIPTLOG}" 2>&1
+	#"$TARGET_DIR/scripts/vbox-usb.sh" start >> "${SCRIPTLOG}" 2>&1
 	# start WOL service
 	"$TARGET_DIR/scripts/wol.sh" start >> "${SCRIPTLOG}" 2>&1
 	# insert nginx config, this integrates app in DSM
@@ -95,7 +95,7 @@ stop()
 	"$TARGET_DIR/scripts/vboxweb-service.sh" stop >> "${SCRIPTLOG}" 2>&1
 	
 	# stop USB fix
-	"$TARGET_DIR/scripts/vbox-usb.sh" stop >> "${SCRIPTLOG}" 2>&1
+	#"$TARGET_DIR/scripts/vbox-usb.sh" stop >> "${SCRIPTLOG}" 2>&1
 	
 	# unload drivers
 	"$TARGET_DIR/scripts/vboxdrv.sh" stop >> "${SCRIPTLOG}" 2>&1
@@ -127,11 +127,24 @@ case $1 in
 		stop && start
 	;;
   	status)
-		if [ -e "/usr/syno/synoman/webman/3rdparty/${PACKAGE_NAME}" ]; then
+		# 0: package is running.
+		# 1: program of package is dead and /var/run pid file exists.
+		# 2: program of package is dead and /var/lock lock file exists
+		# 3: package is not running
+		# 4: package status is unknown
+		# 150: package is broken and should be reinstalled. 
+		if [ $(ps aux | grep /opt/VirtualBox -c) == 4 ]; then 
 			exit 0
-		else
+		fi
+		
+		if [ -f "/var/run/vboxweb-service" ]; then
 			exit 1
 		fi
+		
+		if [ $(lsmod | grep vbox -c) == 4]; then
+			exit 4
+		fi
+		exit 3
         ;;
 	killall)
 		stop

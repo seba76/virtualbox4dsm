@@ -178,17 +178,17 @@ postinst ()
 
 	# should enable WOL deamon
 	if [ "${WOL_SVC}" == "true" ]; then
-		touch /var/packages/virtualbox/enabled_wol
+		touch ${PACKAGE_DIR}/enabled_wol
 		sed -i -e "s|@url@|${WEBSVC_URL}|g" "/etc/vbox/vboxwolservice.ini"			
 		
 		PWHASH=$("${PACKAGE_DIR}/target/wol/vboxwebclient.py" --hash ${WEBSVC_PASS})
 		sed -i -e "s|@pwhash@|${PWHASH:=}|g" "/etc/vbox/vboxwolservice.ini"
 	else
-		[ -f /var/packages/virtualbox/enabled_wol ] && rm -f /var/packages/virtualbox/enabled_wol
+		[ -f ${PACKAGE_DIR}/enabled_wol ] && rm -f ${PACKAGE_DIR}/enabled_wol
 	fi
 		
 	# Install service definition
-	/usr/syno/bin/servicetool --install-configure-file --package /var/packages/virtualbox/target/virtualbox.sc
+	#/usr/syno/bin/servicetool --install-configure-file --package ${PACKAGE_DIR}/target/etc/virtualbox.sc
 
 	# set default vm machine folder to share
 	# set default vm machine folder to ${VOL_PATH}/${SHARE_NAME}"
