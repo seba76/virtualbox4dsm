@@ -3,15 +3,12 @@
 [ -f /etc/vbox/vbox.cfg ] && . /etc/vbox/vbox.cfg
 
 if [ -z "$SYNOPKG_PKGNAME" ]; then
-    PACKAGE_NAME="virtualbox"
+    PACKAGE_NAME="virtualbox4dsm"
     PACKAGE_VER=`get_key_value "/var/packages/${PACKAGE_NAME}/INFO" "version"`
 else
     PACKAGE_NAME=$SYNOPKG_PKGNAME
     PACKAGE_VER=$SYNOPKG_PKGVER
 fi
-
-PIDFILE="/var/packages/virtualbox/target/wolsvc.pid"
-WOL="/var/packages/virtualbox/enabled_wol"
 
 
 DSM_CONFIG="/etc.defaults/synoinfo.conf"
@@ -20,33 +17,9 @@ TARGET_DIR="$PACKAGE_DIR/target"
 PACKAGE_ENABLED="${PACKAGE_DIR}/enabled"
 SCRIPTLOG="$TARGET_DIR/share/scripts.log"
 
-NGINX_CONF_FOLDER="/usr/local/etc/nginx/conf.d"
-VBOX_NGINX_DISABLED_CONF="SYNO.SDS.virtualbox.disabled.conf"
-VBOX_NGINX_CONF="SYNO.SDS.virtualbox.conf"
-VBOX_NGINX_PINGPONG_CONF=""
+PIDFILE="$TARGET_DIR/wolsvc.pid"
+WOL="$PACKAGE_DIR/enabled_wol"
 
-remove_nginx_conf()
-{
-	rm -f $NGINX_CONF_FOLDER/$VBOX_NGINX_CONF
-
-	if [ -f "$NGINX_CONF_FOLDER/$VBOX_NGINX_PINGPONG_CONF" ]; then
-		rm -f $NGINX_CONF_FOLDER/$VBOX_NGINX_PINGPONG_CONF
-	fi
-
-	cp -f $TARGET_DIR/etc/fpm.d/$VBOX_NGINX_DISABLED_CONF $NGINX_CONF_FOLDER/
-}
-
-insert_nginx_conf()
-{
-	rm -f $NGINX_CONF_FOLDER/$VBOX_NGINX_DISABLED_CONF
-
-	cp -f $TARGET_DIR/etc/fpm.d/$VBOX_NGINX_CONF $NGINX_CONF_FOLDER/
-
-	grep_result=`/usr/bin/grep pingpong\.php /etc/nginx/nginx.conf`
-	if [ -z "$grep_result" ]; then  # pingpong.php rule not found in nginx conf, insert it
-		cp -f $TARGET_DIR/etc/fpm.d/$VBOX_NGINX_PINGPONG_CONF $NGINX_CONF_FOLDER/
-	fi
-}
 
 start()
 {
@@ -72,8 +45,6 @@ start()
 	#"$TARGET_DIR/scripts/vbox-usb.sh" start >> "${SCRIPTLOG}" 2>&1
 	# start WOL service
 	"$TARGET_DIR/scripts/wol.sh" start >> "${SCRIPTLOG}" 2>&1
-	# insert nginx config, this integrates app in DSM
-	#insert_nginx_conf
 	echo "**** Start finished at $(date) ****" >> "${SCRIPTLOG}" 2>&1
 }
 
@@ -81,9 +52,6 @@ stop()
 {
 	echo "**** Stop at $(date) ****" >> "${SCRIPTLOG}" 2>&1
 	# stop services, we will let vboxdrv shutdown VM's based on vbox.cfg
-
-	# remove nginx config
-	#remove_nginx_conf
 
 	# stop WOL service
 	"$TARGET_DIR/scripts/wol.sh" stop >> "${SCRIPTLOG}" 2>&1
@@ -101,7 +69,7 @@ stop()
 	"$TARGET_DIR/scripts/vboxdrv.sh" stop >> "${SCRIPTLOG}" 2>&1
 
 	# copy config to share
-	if [ -d /var/packages/virtualbox/target/share/ ]; then
+	if [ -d $TARGET_DIR/share/ ]; then
 		cp -rf "${HOME}"/.config $TARGET_DIR/share/
 	fi
 	
@@ -141,7 +109,7 @@ case $1 in
 			exit 1
 		fi
 		
-		if [ $(lsmod | grep vbox -c) == 4]; then
+		if [ $(lsmod | grep vbox -c) == 4 ]; then
 			exit 4
 		fi
 		exit 3

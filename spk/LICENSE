@@ -9,8 +9,4 @@ RESULTING FROM INSTALLING THIS PACKAGE!
 CHANGELOG 
 ===== 
 Version: 5.2.16-123759
-Update VirtualBox to version 5.2.16 and phpVirtualBox to version 5.2
-
-Version: 5.0.36-114008
-Update VirtualBox and Kernels to version 5.0.36-114008
-Intorduced Guest WOL service
+First version of virtualbox4dsm

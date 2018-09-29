@@ -63,7 +63,7 @@ stop_vms()
                     for v in $VMS; do
                     	echo "acpipower for $v"
                         $VBOXMANAGE --nologo controlvm $v acpipowerbutton
-                        wait=30
+                        wait=60
                     done
                     echo "... Done!"
                 elif [ "$SHUTDOWN" = "savestate" ]; then

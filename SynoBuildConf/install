@@ -58,6 +58,9 @@ Install() {
 		6.1)
 			KERNEL="3.10.102"
 			;;
+		6.2)
+			KERNEL="3.10.105"
+			;;
 		*)
 			echo "${DSM_SHLIB_MAJOR}.${DSM_SHLIB_MINOR} unknown verion of DSM, can't guess kernel version"
 			exit 1
@@ -66,6 +69,7 @@ Install() {
 	
 	### update drivers for this version
 	echo "Update drivers in ./package/drivers/${PLATFORM}/${KERNEL}/ with ./package/opt/VirtualBox/src/vboxhost/*.ko"
+	[ ! -d  package/drivers/${PLATFORM}/${KERNEL} ] && mkdir  package/drivers/${PLATFORM}/${KERNEL}
 	cp -f package/opt/VirtualBox/src/vboxhost/*.ko package/drivers/${PLATFORM}/${KERNEL}/
 	cp -r package/* "${INST_DIR}/"
 
@@ -82,16 +86,16 @@ Install() {
 GenerateINFO() {
     ### Generate INFO file
     ./INFO.sh "${DSM_SHLIB_MAJOR}.${DSM_SHLIB_MINOR}-${DSM_BUILD_NUM}" "${DATE}" > spk/INFO
-    #./INFO.sh > spk/INFO
     cp spk/INFO "${PKG_DIR}"
     cp spk/INFO INFO
 }
 
 InstallSynologyConfig(){
-    ### Copy licence
+    ### Copy license
     cp -av spk/LICENSE "${PKG_DIR}"
+    cp -r spk/conf/ "${PKG_DIR}"
     cp -r spk/scripts/ "${PKG_DIR}"
-    cp spk/PACKAGE_ICON{,_256}.PNG "${PKG_DIR}"
+    cp spk/PACKAGE_ICON{,_120,_256}.PNG "${PKG_DIR}"
     cp -r spk/WIZARD_UIFILES/ "${PKG_DIR}"
 }
 
