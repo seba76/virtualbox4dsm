@@ -2,17 +2,15 @@
 
 [ -f /etc/vbox/vbox.cfg ] && . /etc/vbox/vbox.cfg
 
-WOL="/var/packages/virtualbox/enabled_wol" 
 PIDFILE=/run/vboxwolservice.pid
-PACKAGE_DIR=/var/packages/virtualbox
+PACKAGE_DIR=/var/packages/virtualbox4dsm
+WOL="${PACKAGE_DIR}/enabled_wol" 
 
 start()
 {
     echo "vbox wol starting"
-	if [ -f ${WOL} ]; then
-		cd "${PACKAGE_DIR}/target/wol/"
-		"${PACKAGE_DIR}/target/wol/vboxwolservice.py" --pid ${PIDFILE} --log "${PACKAGE_DIR}/target/share/vboxwolservice.log"
-	fi 
+	cd "${PACKAGE_DIR}/target/wol/"
+	"${PACKAGE_DIR}/target/wol/vboxwolservice.py" --pid ${PIDFILE} --log "${PACKAGE_DIR}/target/share/vboxwolservice.log"
 	echo "vbox wol done"
 }
 
@@ -43,6 +41,10 @@ status()
 case "$1" in
 
 	start)
+		if [ ! -f "${WOL}" ]; then
+			exit 0;
+		fi
+
 		start
 		;;
 	stop)

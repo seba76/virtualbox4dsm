@@ -1,16 +1,11 @@
 {
-	"php70": {
-		"fpm-conf": [{
-				"relpath": "etc/fpm.d/SYNO.SDS.virtualbox.conf"
-			}
-		],
-		"php-ini": [{
-				"relpath": "etc/SYNO.SDS.virtualbox.ini"
-			}
-		]
-	},
-	"service-cfg":{},
 	"port-config": {
 		"protocol-file": "etc/virtualbox.sc"
+	},
+	"data-share": {
+		"shares": [{
+			"name": "{{wizard_virtualbox_share}}",
+			"permission": {}
+		}]
 	}
 }

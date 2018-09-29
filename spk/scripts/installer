@@ -1,21 +1,15 @@
 #!/bin/sh
 
 # Package
-PACKAGE="virtualbox"
+PACKAGE="virtualbox4dsm"
 
 # some variables
 INSTALL_DIR="/usr/local/${PACKAGE}"
-WEB_DIR="/var/services/web/"
 PACKAGE_DIR="/var/packages/${PACKAGE}"
 VBOX_USER=root
 USER=${USER}
 
 # wizard variables
-PHPVBOX_NOAUTH=$([ "${wizard_no_auth}" == "true" ] && echo "true" || echo "false")
-PHPVBOX_ADVANCEDCONFIG=$([ "${wizard_enable_advanced_config}" == "true" ] && echo "true" || echo "false")
-PHPVBOX_STARTSTOPCONFIG=$([ "${wizard_start_stop_config}" == "true" ] && echo "true" || echo "false")
-PHPVBOX_LNG=$([ "${wizard_language_ger}" == "true" ] && echo "de" || echo "en")
-PHPVBOX_KBD=$([ "${wizard_keyboard_layout_ger}" == "true" ] && echo "DE" || echo "EN")
 VBOX_HTTPS=$([ "${wizard_use_https}" == "true" ] && echo "true" || echo "false")
 VBOX_ACTION="acpibutton"
 VBOX_ACTION=$([ "${wizard_on_stop_poweroff}" == "true" ] && echo "poweroff" || echo $VBOX_ACTION)
@@ -30,12 +24,13 @@ if [ "${WEBSVC_DOMAIN}" == "" ]; then
 else
   WEBSVC_URL="${WEBSVC_PROTOCOL}://${{wizard_vboxsvcdomain}:18083"
 fi
+
+# if bind to all fix url
 if [ "${WEBSVC_BIND}" == "0.0.0.0" ]; then
   WEBSVC_URL="${WEBSVC_PROTOCOL}://127.0.0.1:18083"
 fi
 
 WOL_SVC=$([ "${wizard_enable_wol}" == "true" ]  && echo "true" || echo "false")
-INTEGRATE=$([ "${wizard_integrate}" == "true" ]  && echo "true" || echo "false")
 
 # get dynamic stuff
 VOL_PATH=$(servicetool --get-alive-volume)
@@ -45,7 +40,7 @@ DIST=$(uname -a | awk '{print $14}')
 preinst ()
 {
 	# check for supported kernel
-	if [[ ${KERNEL} != "3.10.102" && ${KERNEL} != "3.10.77" && ${KERNEL} != "3.10.35" && ${KERNEL} != "3.2.40" ]]; then
+	if [[ ${KERNEL} != "3.10.105" ]]; then
 		echo "Kernel ${KERNEL} is not supported"
 		exit 1
 	fi
@@ -59,34 +54,11 @@ postinst ()
 	synoshare --get ${SHARE_NAME} > /dev/null 2>&1
 	if [ $? -ne 0 ]
 	then
-    		# create shared folder
-    		synoshare -add  ${SHARE_NAME} "Virtualbox home folder"  ${VOL_PATH}/${SHARE_NAME} "" "${USER},${VBOX_USER}" "" 0 7 > /dev/null 2>&1
-    		synoshare --setuser ${SHARE_NAME} RW = ${USER},${VBOX_USER} > /dev/null 2>&1
-    		if [ "`synoacltool -get ${VOL_PATH}/${SHARE_NAME} | grep \"user:${VBOX_USER}\"`" ]
-    		then
-     			synoacltool -replace ${VOL_PATH}/${SHARE_NAME} `synoacltool -get ${VOL_PATH}/${SHARE_NAME} | grep "user:${VBOX_USER}" | awk 'BEGIN { OFS=" "; } { gsub(/[^[:alnum:]]/, "", $1); print $1;}' | head -1` user:${VBOX_USER}:allow:rwxpdDaARWcCo:fd-- > /dev/null 2>&1
-    		else
-      			synoacltool -add ${VOL_PATH}/${SHARE_NAME} user:${VBOX_USER}:allow:rwxpdDaARWcCo:fd-- > /dev/null 2>&1
-    		fi
-	else
-    		# set rights on existing folder for new user
-    		synoshare --setuser ${SHARE_NAME} RW = ${USER},${VBOX_USER} > /dev/null 2>&1
-    		if [ "`synoacltool -get ${VOL_PATH}/${SHARE_NAME}|grep \"user:${VBOX_USER}\"`" ]
-    		then
-      			synoacltool -replace ${VOL_PATH}/${SHARE_NAME} `synoacltool -get ${VOL_PATH}/${SHARE_NAME} | grep "user:${VBOX_USER}" | awk 'BEGIN { OFS=" "; } { gsub(/[^[:alnum:]]/, "", $1); print $1;}'|head -1` user:${VBOX_USER}:allow:rwxpdDaARWcCo:fd-- > /dev/null 2>&1
-    		else
-      			synoacltool -add ${VOL_PATH}/${SHARE_NAME} user:${VBOX_USER}:allow:rwxpdDaARWcCo:fd-- > /dev/null 2>&1
-    		fi
-
-    		# This gives error during install 
-			# Ensure the vbox user is in administrators group (Syno share perm fix)
-    		#if [ `echo ${ADMIN_USERS} | grep ${VBOX_USER}|wc -l` -eq 0 ]
-    		#then
-      		#	synogroup --member administrators ${VBOX_USER} > /dev/null 2>&1
-    		#fi
+ 		echo "Shared folder ${SHARE_NAME} doesn't exist"
+		exit 1
 	fi
 
-	# lets create link to share path, just in case
+	# lets create link to share path
 	SHARE_PATH=$(synoshare --get virtualbox | grep 'Path' | cut -d[ -f2 | cut -d] -f1)
 	ln -sf ${SHARE_PATH} "${PACKAGE_DIR}/target/share"
 	echo "SHARE_PATH=${SHARE_PATH}" > "${PACKAGE_DIR}/target/.config"
@@ -99,38 +71,7 @@ postinst ()
 	# Link package dir to install dir
 	ln -s ${SYNOPKG_PKGDEST} ${INSTALL_DIR}
 
-	if [ "${INTEGRATE}" == "false" ]; then
-		# Install the phpVirtualBox web interface in web station
-		mkdir -p ${WEB_DIR}/phpvirtualbox
-		cp -pR ${INSTALL_DIR}/www/phpvirtualbox ${WEB_DIR}/
-
-		if [ $? -ne 0 ]; then
-			echo "Unable to install phpwirtualbox"
-			exit 1
-		fi
-	fi
-	
-	# Create a default configuration file for phpVirtualBox
-	if [ "${INTEGRATE}" == "false" ]; then
-		CONFIG_PHP="${WEB_DIR}/phpvirtualbox/config.php"
-	else
-		CONFIG_PHP="${INSTALL_DIR}/www/phpvirtualbox/config.php"
-	fi
-	
-	if [ ! -f "${CONFIG_PHP}" ]; then
-		cp "${INSTALL_DIR}/www/config.php.synology" "${CONFIG_PHP}"
-		sed -i -e "s|@user@|${VBOX_USER:=}|g" "${CONFIG_PHP}"
-		sed -i -e "s|@pass@|${WEBSVC_PASS:=}|g" "${CONFIG_PHP}"
-		sed -i -e "s|@location@|${WEBSVC_URL:=}|g" "${CONFIG_PHP}"
-		sed -i -e "s|@noAuth@|${PHPVBOX_NOAUTH:=true}|g" "${CONFIG_PHP}"
-		sed -i -e "s|@enableAdvancedConfig@|${PHPVBOX_ADVANCEDCONFIG:=true}|g" "${CONFIG_PHP}"
-		sed -i -e "s|@startStopConfig@|${PHPVBOX_STARTSTOPCONFIG:=true}|g" "${CONFIG_PHP}"
-		sed -i -e "s|@lng@|${PHPVBOX_LNG:=en}|g" "${CONFIG_PHP}"
-		sed -i -e "s|@kbd@|${PHPVBOX_KBD:=EN}|g" "${CONFIG_PHP}"
-		chmod ga+w "${CONFIG_PHP}"
-	fi
-
-   	# Install vbox to /opt/VirtualBox
+	# Install vbox to /opt/VirtualBox
 	[ ! -d /opt ] && mkdir /opt
 	cp -pR "${INSTALL_DIR}/opt/VirtualBox" /opt/VirtualBox
 
@@ -162,7 +103,7 @@ postinst ()
 		cp -rf "${INSTALL_DIR}"/etc/vbox /etc/
 		sed -i -e "s|acpibutton|${VBOX_ACTION}|g" /etc/vbox/vbox.cfg
 		sed -i -e "s|root|${VBOX_USER}|g" /etc/vbox/vbox.cfg
-        sed -i -e "s|/var/log/vbox.log|${VOL_PATH}/${SHARE_NAME}/vbox.log|g" /etc/vbox/vbox.cfg
+		sed -i -e "s|/var/log/vbox.log|${VOL_PATH}/${SHARE_NAME}/vbox.log|g" /etc/vbox/vbox.cfg
 		sed -i -e "s|127.0.0.1|${WEBSVC_BIND}|g" /etc/vbox/vbox.cfg
 		if [ "${WEBSVC_BIND}" != "127.0.0.1" ]; then
 			sed -i -e "s|VBOXWEB_AUTH_LIBRARY=null|VBOXWEB_AUTH_LIBRARY='VBoxAuthSimple'|g" /etc/vbox/vbox.cfg
@@ -170,8 +111,16 @@ postinst ()
 			echo "VBOXWEB_AUTH_PWHASH='${PWHASH}'" >>  /etc/vbox/vbox.cfg
 		fi
 		if [ "${VBOX_HTTPS}" == "true" ]; then
-			cat /usr/syno/etc/ssl/ssl.crt/server.crt > /etc/vbox/server.pem
-			cat /usr/syno/etc/ssl/ssl.key/server.key >> /etc/vbox/server.pem
+			if [ -f /usr/syno/etc/certificate/system/default/cert.pem ]; then
+				cat /usr/syno/etc/certificate/system/default/cert.pem > /etc/vbox/server.pem
+				cat /usr/syno/etc/certificate/system/default/privkey.pem >> /etc/vbox/server.pem
+			else 
+				openssl req -subj '/CN=${WEBSVC_BIND}/O=VirtualBox/C=US' -new -newkey rsa:2048 -sha256 -days 365 -nodes -x509 -keyout server.key -out server.crt
+				cat cert.pem > /etc/vbox/server.pem
+				cat privkey.pem >> /etc/vbox/server.pem
+				rm cert.pem privkey.pem
+			fi
+
 			echo "VBOXWEB_SSL_KEYFILE='/etc/vbox/server.pem'" >>  /etc/vbox/vbox.cfg
 		fi
 	fi
@@ -187,8 +136,6 @@ postinst ()
 		[ -f ${PACKAGE_DIR}/enabled_wol ] && rm -f ${PACKAGE_DIR}/enabled_wol
 	fi
 		
-	# Install service definition
-	#/usr/syno/bin/servicetool --install-configure-file --package ${PACKAGE_DIR}/target/etc/virtualbox.sc
 
 	# set default vm machine folder to share
 	# set default vm machine folder to ${VOL_PATH}/${SHARE_NAME}"
@@ -196,8 +143,7 @@ postinst ()
 
 	# move additions iso to share
 	if [ -d /opt/VirtualBox/additions ]; then
-		cp -R  ${VOL_PATH}/${SHARE_NAME}
-		rm -rf /opt/VirtualBox/additions
+		cp -r /opt/VirtualBox/additions ${VOL_PATH}/${SHARE_NAME}
 	fi
 	
 	exit 0
@@ -207,7 +153,7 @@ preuninst ()
 {
 	if [ "UNINSTALL" = "$SYNOPKG_PKG_STATUS" ]; then
 		# remove service configure file when uninstalling the package
-		/usr/syno/bin/servicetool --remove-configure-file --package virtualbox.sc
+		#/usr/syno/bin/servicetool --remove-configure-file --package virtualbox.sc
 
 		# stop service
 		"${PACKAGE_DIR}/target/scripts/start-stop-status" stop		
@@ -220,9 +166,6 @@ postuninst ()
 {
 	# Remove link
 	rm -f ${INSTALL_DIR}
-
-	# Remove the web interface
-	rm -fr ${WEB_DIR}/phpvirtualbox
 
 	if [ -d /etc/vbox ]; then
 		rm -fr /etc/vbox
@@ -250,7 +193,7 @@ preupgrade ()
 	# Save some stuff
 	rm -fr ${TMP_DIR}/${PACKAGE}
 	mkdir -p ${TMP_DIR}/${PACKAGE}
-	[ -f "${WEB_DIR}/phpvirtualbox/config.php" ] && mv "${WEB_DIR}/phpvirtualbox/config.php" ${TMP_DIR}/${PACKAGE}/
+
 	[ -f /etc/vbox/vbox.cfg ] && mv /etc/vbox/vbox.cfg ${TMP_DIR}/${PACKAGE}/
 	[ -f /etc/vbox/vboxwolservice.ini ] && mv /etc/vbox/vboxwolservice.ini ${TMP_DIR}/${PACKAGE}/
 	wizard_bind_ip=${/bin/get_key_value /etc/vbox/vbox.cfg VBOXWEB_HOST}
@@ -260,16 +203,14 @@ preupgrade ()
 postupgrade ()
 {
 	# Restore some stuff
-	rm -f "${WEB_DIR}/phpvirtualbox/config.php"
-	[ -f ${TMP_DIR}/${PACKAGE}/config.php ] && mv ${TMP_DIR}/${PACKAGE}/config.php "${WEB_DIR}/phpvirtualbox/config.php"
 	[ -f ${TMP_DIR}/${PACKAGE}/vbox.cfg ] && mv ${TMP_DIR}/${PACKAGE}/vbox.cfg /etc/vbox/vbox.cfg
 	[ -f ${TMP_DIR}/${PACKAGE}/vboxwolservice.ini ] && mv ${TMP_DIR}/${PACKAGE}/vboxwolservice.ini /etc/vbox/vboxwolservice.ini
 	rm -fr ${TMP_DIR}/${PACKAGE}
 
 	# start service
-    "${PACKAGE_DIR}/target/scripts/start-stop-status" start
+	"${PACKAGE_DIR}/target/scripts/start-stop-status" start
 
-   	exit 0
+	exit 0
 }
 
 set_key_value() {
