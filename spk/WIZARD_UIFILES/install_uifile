@@ -1,72 +1,8 @@
 [{
-    "step_title": "phpVirtualBox configuration (page 1)",
-    "items": [{
-        "type": "multiselect",
-        "desc": "No authentication? You will not be prompted to login into phpVirtualBox.",
-        "subitems": [{
-            "key": "wizard_no_auth",
-            "desc": "Disable authentication"
-        }]
-    }, {
-        "type": "multiselect",
-        "desc": "Enable advanced configuration items (normally hidden in the VirtualBox GUI)?",
-        "subitems": [{
-            "key": "wizard_enable_advanced_config",
-            "desc": "Enable advanced configuration"
-        }]
-    }, {
-        "type": "multiselect",
-        "desc": "Enable startup / shutdown configuration?",
-        "subitems": [{
-            "key": "wizard_start_stop_config",
-            "desc": "Enable startup of VM's"
-        }]
-    }, {
-       "type": "textfield",
-       "desc": "Domain name to which vboxwebsvc will be bound to (optional, leave blank if unsure)",
-       "subitems": [{
-                        "key": "wizard_vboxsvcdomain",
-                        "desc": "Domain name",
-                        "defaultValue": ""
-       }]
-    }]
-}, 
-{
-	"step_title": "phpVirtualBox language configuration (page 2)",
-	"items": [{
-		"type": "singleselect",
-		"desc": "Default language. See languages folder for more language options. Can also be changed in File -> Preferences -> Language in phpVirtualBox.",
-		"subitems": [{
-			"key": "wizard_language_en",
-			"desc": "English Language",
-			"defaultValue": true
-		},
-		{
-			"key": "wizard_language_ger",
-			"desc": "German Language",
-			"defaultVaule": false
-		}]
-	},
-	{
-		"type": "singleselect",
-		"desc": "Console tab keyboard layout. Currently Oracle's RDP client only supports EN and DE.",
-		"subitems": [{
-			"key": "wizard_keyboard_layout_en",
-			"desc": "English Layout",
-			"defaultValue": true
-		},
-		{
-			"key": "wizard_keyboard_layout_ger",
-			"desc": "German Layout",
-			"defaultVaule": false
-		}]
-	}]
-},
-{
-    "step_title": "VirtualBox configuration (page 3)",
+    "step_title": "VirtualBox configuration (page 1 of 2)",
     "items": [{
         "type": "singleselect",
-        "desc": "On Host shutdown what to do with running Guest VM?",
+        "desc": "On DSM shutdown what to do with running Guest VM?",
         "subitems": [{
 			"key": "wizard_on_stop_poweroff",
 			"desc": "poweroff",
@@ -90,11 +26,11 @@
     }]
 },
 {
-    "step_title": "VirtualBox configuration (page 4)",
+    "step_title": "VirtualBox configuration (page 2 of 2)",
     "items": [
     {
 		"type": "textfield",
-		"desc": "SOAP IP of vboxwebsrv (not phpVirtualBox's URL)",
+		"desc": "Vboxwebsrv SOAP service bind IP (not phpVirtualBox's URL)",
 		"subitems": [{
 				"key": "wizard_bind_ip",
 				"desc": "Bind to IP",
@@ -103,7 +39,7 @@
     },
 	{
         "type": "multiselect",
-        "desc": "Shold vboxwebsrv shold use HTTPS protocol (usefull if bind IP is not 127.0.0.1).",
+        "desc": "Should vboxwebsrv use HTTPS protocol (useful if bind IP is not 127.0.0.1).",
         "subitems": [{
                         "key": "wizard_use_https",
                         "desc": "Use HTTPS",

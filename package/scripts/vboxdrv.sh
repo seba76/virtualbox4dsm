@@ -7,7 +7,7 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin:$PATH
 DEVICE=/dev/vboxdrv
 # INSTALL_DIR is from vbox.cfg
 VBOXMANAGE="$INSTALL_DIR/VBoxManage"
-PACKAGE=virtualbox
+PACKAGE=virtualbox4dsm
 PACKAGE_DIR="/var/packages/${PACKAGE}"
 
 export BUILD_TYPE
