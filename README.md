@@ -11,7 +11,7 @@ install it manually in package center. During installation you will be asked few
 goes well you will have VirtualBox running. For remote management access you will need PhpVirtualBox
 or some other application like VBoxManage for Android.
 
-VirtualBox4DSM spk you can find [here](/seba76/virtualbox4dsm/releases).
+VirtualBox4DSM spk you can find [here](./releases).
 
 ## Requirements
 - This package will work only on Intel boxes.
