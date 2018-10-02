@@ -1,6 +1,6 @@
 # VirtualBox for Synology DSM
 
-This is build for VirtualBox service running on Synology NAS boxes running appropriate Intel CPU. This repo doesn't contain GUI for that head to phpvirtualbox4dsm repo.
+This is build for VirtualBox service running on Synology NAS boxes running appropriate Intel CPU. This repo doesn't contain GUI for that head to [phpvirtualbox4dsm](https://github.com/seba76/phpvirtualbox4dsm) repo.
 
 Keep in mind installing this package can make your NAS unreachable since it is still in beta phase.
 
@@ -11,7 +11,7 @@ install it manually in package center. During installation you will be asked few
 goes well you will have VirtualBox running. For remote management access you will need PhpVirtualBox
 or some other application like VBoxManage for Android.
 
-VirtualBox4DSM spk you can find [here](./releases).
+VirtualBox4DSM spk you can find [here](https://github.com/seba76/virtualbox4dsm/releases).
 
 ## Requirements
 - This package will work only on Intel boxes.
