@@ -1,6 +1,6 @@
 # VirtualBox for Synology DSM
 
-This is build for VirtualBox service running on Synology NAS boxes running appropriate Intel CPU. This repo doesn't contain GUI for that head to [phpvirtualbox4dsm](https://github.com/seba76/phpvirtualbox4dsm) repo.
+This is build for VirtualBox service running on Synology NAS boxes running appropriate Intel CPU. This repo doesn't contain GUI for that head to [phpvirtualbox4dsm](https://github.com/seba76/phpvirtualbox4dsm).
 
 Keep in mind installing this package can make your NAS unreachable since it is still in beta phase.
 
@@ -16,6 +16,6 @@ VirtualBox4DSM spk you can find [here](https://github.com/seba76/virtualbox4dsm/
 ## Requirements
 - This package will work only on Intel boxes.
 - You need to have enough memory.
-- Other virtualization applications have to be un-installed. If not you can lose access to your box.
+- Other virtualization applications have to be un-installed, otherwise you can lose access to your box.
 - Control Panel -> Network -> Network Interface -> Manage -> Open vSwitch Settings -> Enable Open vSwitch 
 	- must be unchecked.
