@@ -1,4 +1,4 @@
-# VirtualBox for Synology DSM
+# virtualbox4dsm
 
 This is build for VirtualBox service running on Synology NAS boxes running appropriate Intel CPU. This repo doesn't contain GUI for that head to [phpvirtualbox4dsm](https://github.com/seba76/phpvirtualbox4dsm).
 
