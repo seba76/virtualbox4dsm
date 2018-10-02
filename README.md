@@ -14,6 +14,6 @@ or some other application like VBoxManage for Android.
 ## Requirements
 - This package will work only on Intel boxes.
 - You need to have enough memory.
-- Other virtualization applications have to be un-installed, otherwise you can lose access to your box.
+- Other virtualization applications have to be un-installed (like VMM), otherwise you can lose access to your box.
 - Control Panel -> Network -> Network Interface -> Manage -> Open vSwitch Settings -> Enable Open vSwitch 
 	- must be unchecked.
