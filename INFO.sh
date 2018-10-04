@@ -11,10 +11,6 @@ description="VirtualBox is a powerful x86 and AMD64/Intel64 virtualization produ
 report_url="https://github.com/seba76/virtualbox4dsm/"
 support_url="https://github.com/seba76/virtualbox4dsm/"
 distributor_url="https://github.com/seba76/virtualbox4dsm/releases"
-#install_dep_package="WebStation:PHP7.0"
-#install_dep_services="WebStation:Apache2.4:PHP5.6"
-#startstop_restart_services="nginx"
-#instuninst_restart_services="nginx"
 thirdparty="true"
 support_conf_folder="yes"
 #support_aaprofile="yes"
@@ -22,9 +18,12 @@ support_conf_folder="yes"
 changelog="Version: 5.1.28-114008"
 #reloadui="yes"
 displayname="VirtualBox"
-#dsmuidir="www"
-#adminurl="/phpvirtualbox/"
+if [ "$(pkg_get_platform)" == "x86" ]; then
+arch="x86_64"
+exclude_arch="x86 dockerx64 kvmx64"
+else
 arch="$(pkg_get_platform)"
+fi
 os_min_ver="$1"
 [ "$(caller)" != "0 NULL" ] && return 0
 pkg_dump_info

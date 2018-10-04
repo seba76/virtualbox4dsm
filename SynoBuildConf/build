@@ -1,6 +1,6 @@
 #!/bin/bash
 
-touch /logs/virtualbox.build
+touch /logs/virtualbox4dsm.build
 
 # if env MakeClean is set to yes clean
 case ${MakeClean} in
@@ -76,10 +76,9 @@ if [ ! -f /source/${SYNO_KERNEL_SOURCE_DIR}/Module.symvers ]; then
 	cd /source/${SYNO_KERNEL_SOURCE_DIR}/
 	echo "Building modules"
 	make ${MAKE_FLAGS}  ARCH=${ARCH} CROSS_COMPILE="$CROSS_COMPILE"  modules_prepare
-	cd /source/virtualbox
+	cd /source/virtualbox4dsm
 fi
 
-touch  /logs/virtualbox.build
 cd ./package/opt/VirtualBox/src/vboxhost/
 #make ${MAKE_FLAGS} KERN_DIR=/source/${SYNO_KERNEL_SOURCE_DIR}/ ARCH=${ARCH} CROSS_COMPILE= 
 make ${MAKE_FLAGS} KSRC="$KSRC" CROSS_COMPILE="$CROSS_COMPILE" ARCH="$ARCH" KERN_DIR="$KSRC" KERN_VER=3.10.x
