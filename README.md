@@ -6,7 +6,7 @@ Keep in mind installing this package can make your NAS unreachable since it is s
 
 # Installation
 
-Latest spk file for bromolow can be found in [release](https://github.com/seba76/virtualbox4dsm/releases). Download latest spk for you Synology box and
+Latest spk file for bromolow and x86_64 can be found in [release](https://github.com/seba76/virtualbox4dsm/releases). Download latest spk for you Synology box and
 install it manually in package center. During installation you will be asked few questions. If all 
 goes well you will have VirtualBox running. For remote management access you will need PhpVirtualBox
 or some other application like VBoxManage for Android.
