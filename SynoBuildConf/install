@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PKG_NAME="virtualbox"
+PKG_NAME="virtualbox4dsm"
 INST_DIR="/tmp/_${PKG_NAME}"
 PKG_DIR="/tmp/_${PKG_NAME}_pkg"
 PKG_DEST="/image/packages"
@@ -102,13 +102,13 @@ InstallSynologyConfig(){
 MakePackage() {
 	[ -f /pkgscripts/include/pkg_util.sh ] && source /pkgscripts/include/pkg_util.sh
 	[ -f /pkgscripts-ng/include/pkg_util.sh ] && source /pkgscripts-ng/include/pkg_util.sh
-    
+	[ -f .config ] && source .config
 
     ### fix permissions
     chown root:root $PKG_DIR/* -R
 
     pkg_make_package $INST_DIR $PKG_DIR
-    pkg_make_spk $PKG_DIR $PKG_DEST
+    pkg_make_spk $PKG_DIR $PKG_DEST  ${PKG_NAME}-${PLATFORM}-${VirtualBoxVersion}.spk
 }
 
 main() {
