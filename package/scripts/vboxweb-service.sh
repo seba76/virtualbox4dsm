@@ -11,7 +11,7 @@ PIDFILE="/var/run/vboxweb-service"
 # Implementation of user control, execute several commands as another (predefined) user,
 su_command="su - ${VBOXWEB_USER} -s /bin/sh -c"
 
-failure()
+fail_msg()
 {
     echo "$1"
     exit 4
@@ -43,6 +43,7 @@ start() {
             fail_msg "VirtualBox kernel module not loaded!"
             exit 0
         }
+		
         PARAMS="--background"
         [ -n "$VBOXWEB_HOST" ]           && PARAMS="$PARAMS -H $VBOXWEB_HOST"
         [ -n "$VBOXWEB_PORT" ]           && PARAMS="$PARAMS -p $VBOXWEB_PORT"
@@ -124,7 +125,7 @@ restart() {
 }
 
 status() {
-    echo -n "Checking for VBox Web Service"
+    echo -n "Checking status of VBox Web Service. Service is "
     if [ -f $PIDFILE ]; then
         RETVAL=0
         echo " ...running"
