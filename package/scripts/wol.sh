@@ -6,6 +6,10 @@ PIDFILE=/run/vboxwolservice.pid
 PACKAGE_DIR=/var/packages/virtualbox4dsm
 WOL="${PACKAGE_DIR}/enabled_wol" 
 
+vboxdrvrunning() {
+    lsmod | grep -q "vboxdrv[^_-]"
+}
+
 start()
 {
     echo "vbox wol starting"
@@ -44,6 +48,11 @@ case "$1" in
 		if [ ! -f "${WOL}" ]; then
 			exit 0;
 		fi
+
+		vboxdrvrunning || {
+			echo "VirtualBox kernel module not loaded, aborting!"
+			exit 4
+		}
 
 		start
 		;;

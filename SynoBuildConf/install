@@ -25,23 +25,23 @@ Install() {
 	### what platform is this
 	case "$BUILD_TARGET" in
 		PPC_QORIQ)
-				echo "PPC_QORIQ is unsupported platform!"
-				exit 1
-				;;
-			X64)
-				PLATFORM="x86_64"
-				;;
-			BROMOLOWESM|BROMOLOW)
-				PLATFORM="bromolow"
-				;;
-			MARVELL_88F6281)
-				echo "MARVELL_88F6281 is unsupported platform!"
-				exit 1
-				;;
-			*)
-				echo "${BUILD_TARGET} unsupported platform!"
-				exit 1
-				;;
+			echo "PPC_QORIQ is unsupported platform!"
+			exit 1
+			;;
+		X64)
+			PLATFORM="x86_64"
+			;;
+		BROMOLOWESM|BROMOLOW)
+			PLATFORM="bromolow"
+			;;
+		MARVELL_88F6281)
+			echo "MARVELL_88F6281 is unsupported platform!"
+			exit 1
+			;;
+		*)
+			echo "${BUILD_TARGET} unsupported platform!"
+			PLATFORM=$PLATFORM_ABBR
+			;;
 	esac
 	 
 	### what kernel version is this
