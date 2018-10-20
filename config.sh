@@ -197,6 +197,9 @@ case $1 in
     generate_config
     update_info
     update_vboxcfg
+	echo "Ready to exec:"
+	echo "         'sudo ./pkgscripts-ng/PkgCreate.py --print-log -I -p ${DSM_PLAT} -v 6.2 linux-3.10.x'"
+	echo "         'sudo ./pkgscripts-ng/PkgCreate.py --print-log -c -I -S -p ${DSM_PLAT} -v 6.2 -x0 -c virtualbox4dsm'"
   ;;
   clean)
     rm $VirtualBoxFile
