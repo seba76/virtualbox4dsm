@@ -168,7 +168,7 @@ function download_linux()
 function generate_config()
 {
   echo "Generating .config"
-  echo "# platform: ${$DSM_PLAT}" > .config
+  echo "# platform: ${DSM_PLAT}" > .config
   echo "VirtualBoxVersion=${VirtualBoxVersion}" >> .config
   echo "VirtualBoxFile=${VirtualBoxFile}" >> .config
   echo "ExtensionPackFile=${ExtensionPackFile}" >> .config
