@@ -21,19 +21,22 @@ fi
 
 function prompt_for_source()
 {
-	PS3='Please enter your choice: '
-	options=("Bromolow DSM 6.1 (15152)" "Bromolow DSM 6.2 (22259)" "Quit")
+	DSM_VER=dsm62
+	DSM_BRANCH=22259
+	DSM_PLAT=bromolow
+	PS3='Please select DSM varsion: '
+	options=("DSM 6.1 (15152)" "DSM 6.2 (22259)" "Quit")
 	select opt in "${options[@]}"
 	do
 		case $opt in
-			"Bromolow DSM 6.1 (15152)")
-				echo "Setting kernel download link for branch 15152, bromolow platform"
-				KernelTar=https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/15152branch/bromolow-source/linux-3.10.x.txz/download
+			"DSM 6.1 (15152)")
+				DSM_VER=dsm61
+				DSM_BRANCH=15152
 				break
 				;;
-			"Bromolow DSM 6.2 (22259)")
-				echo "Setting kernel download link for branch 22259, bromolow platform"
-				KernelTar=https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/22259branch/bromolow-source/linux-3.10.x.txz/download
+			"DSM 6.2 (22259)")
+				DSM_VER=dsm62
+				DSM_BRANCH=22259
 				break
 				;;
 			"Quit")
@@ -43,6 +46,97 @@ function prompt_for_source()
 			*) echo "invalid option $REPLY";;
 		esac
 	done
+	
+	PS3='Please select platform: '
+	options=("bromolow" "x64" "broadwell" "braswell" "cedarview" "Quit")
+	select opt in "${options[@]}"
+	do
+		case $opt in
+			"bromolow")
+				DSM_PLAT=bromolow
+				break
+				;;
+			"x64")
+				DSM_PLAT=x64
+				break
+				;;
+			"broadwell")
+				DSM_PLAT=broadwell
+				break
+				;;
+			"braswell")
+				DSM_PLAT=braswell
+				break
+				;;
+			"cedarview")
+				DSM_PLAT=cedarview
+				break
+				;;
+			"Quit")
+				exit 1
+				break
+				;;
+			*) echo "invalid option $REPLY";;
+		esac
+	done
+	
+	if [ "$DSM_VER" == "dsm61" ]; then
+		case $DSM_PLAT in
+			bromolow)
+				echo "Setting kernel download link for branch $DSM_BRANCH, $DSM_PLAT platform"
+				KernelTar=https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/15152branch/bromolow-source/linux-3.10.x.txz/download
+			;;
+			x64)
+				echo "Setting kernel download link for branch $DSM_BRANCH, $DSM_PLAT platform"
+				KernelTar=https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/15152branch/x64-source/linux-3.10.x.txz/download
+			;;
+			broadwell)
+				echo "Setting kernel download link for branch $DSM_BRANCH, $DSM_PLAT platform"
+				KernelTar=https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/15152branch/broadwell-source/linux-3.10.x.txz/download
+			;;
+			braswell)
+				echo "Setting kernel download link for branch $DSM_BRANCH, $DSM_PLAT platform"
+				KernelTar=https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/15152branch/braswell-source/linux-3.10.x.txz/download
+			;;
+			cedarview)
+				echo "Setting kernel download link for branch $DSM_BRANCH, $DSM_PLAT platform"
+				KernelTar=https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/15152branch/cedarview-source/linux-3.10.x.txz/download
+			;;
+			*)
+				echo "Unexpected platform: $DSM_PLAT";
+				exit 1
+			;;
+		esac	
+	fi
+	if [ "$DSM_VER" == "dsm62" ]; then
+		case $DSM_PLAT in
+			bromolow)
+				echo "Setting kernel download link for branch 22259, bromolow platform"
+				KernelTar=https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/22259branch/bromolow-source/linux-3.10.x.txz/download
+			;;
+			x64)
+				echo "Setting kernel download link for branch $DSM_BRANCH, $DSM_PLAT platform"
+				KernelTar=https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/22259branch/x64-source/linux-3.10.x.txz/download
+			;;
+			broadwell)
+				echo "Setting kernel download link for branch $DSM_BRANCH, $DSM_PLAT platform"
+				KernelTar=https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/22259branch/broadwell-source/linux-3.10.x.txz/download
+			;;
+			braswell)
+				echo "Setting kernel download link for branch $DSM_BRANCH, $DSM_PLAT platform"
+				KernelTar=https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/22259branch/braswell-source/linux-3.10.x.txz/download
+			;;
+			cedarview)
+				echo "Setting kernel download link for branch $DSM_BRANCH, $DSM_PLAT platform"
+				KernelTar=https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/22259branch/cedarview-source/linux-3.10.x.txz/download
+			;;
+			*)
+				echo "Unexpected platform: $DSM_PLAT";
+				exit 1
+			;;
+		esac	
+	fi
+	
 }
 
 function download_vbox()
@@ -74,7 +168,8 @@ function download_linux()
 function generate_config()
 {
   echo "Generating .config"
-  echo "VirtualBoxVersion=${VirtualBoxVersion}" > .config
+  echo "# platform: ${$DSM_PLAT}" > .config
+  echo "VirtualBoxVersion=${VirtualBoxVersion}" >> .config
   echo "VirtualBoxFile=${VirtualBoxFile}" >> .config
   echo "ExtensionPackFile=${ExtensionPackFile}" >> .config
 }
@@ -109,7 +204,13 @@ case $1 in
     rm -rf package/www/phpvirtualbox
     rm .config
   ;;
+  cleanall)
+    rm $VirtualBoxFile
+    rm $ExtensionPackFile
+    rm -rf package/www/phpvirtualbox ../linux-3.10.x
+    rm .config
+  ;;
   *)
-    echo "Usage: ./config.sh prep|clean";
+    echo "Usage: ./config.sh prep|clean|cleanall";
   ;;
 esac

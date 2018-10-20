@@ -4,6 +4,10 @@ PATH=$PATH:/bin:/sbin:/usr/sbin
 
 [ -f /etc/vbox/vbox.cfg ] && . /etc/vbox/vbox.cfg
 
+vboxdrvrunning() {
+    lsmod | grep -q "vboxdrv[^_-]"
+}
+
 start() { 
 	lst=$(ls -lR /dev/bus/usb/ | grep crw)
 	IFS=$'\n'
@@ -29,13 +33,18 @@ stop() {
 }
 
 case "$1" in
-start)
-    start
-    ;;
-stop)
-    stop
-    ;;
-*)
-    echo "Usage: $0 {start|stop}"
-    exit 1
+	start)
+		vboxdrvrunning || {
+			echo "VirtualBox kernel module not loaded, aborting!"
+			exit 4
+		}
+
+		start
+		;;
+	stop)
+		stop
+		;;
+	*)
+		echo "Usage: $0 {start|stop}"
+		exit 1
 esac 

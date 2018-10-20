@@ -48,30 +48,42 @@ fi
 
 if [ ! -f /source/${SYNO_KERNEL_SOURCE_DIR}/Module.symvers ]; then
 	echo "Kernel modules are not built"
-        if [ ! -f /source/${SYNO_KERNEL_SOURCE_DIR}/.config ]; then
-                case "$BUILD_TARGET" in
-                        PPC_QORIQ)
-                                echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/ppcQorIQ"
-                                cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/ppcQorIQ    /source/${SYNO_KERNEL_SOURCE_DIR}/.config
-                                ;;
-                        X64)
-                                echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/x86_64"
-                                cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/x86_64      /source/${SYNO_KERNEL_SOURCE_DIR}/.config
-                                ;;
-                        BROMOLOWESM|BROMOLOW)
-                                echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/bromolow"
-                                cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/bromolow    /source/${SYNO_KERNEL_SOURCE_DIR}/.config
-                                ;;
-                        MARVELL_88F6281)
-                                echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/88f6281"
-                                cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/88f6281     /source/${SYNO_KERNEL_SOURCE_DIR}/.config
-                                ;;
-                        *)
-                                echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/${PLATFORM_ABBR} for $BUILD_TARGET"
-                                cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/$PLATFORM_ABBR /source/${SYNO_KERNEL_SOURCE_DIR}/.config
-                                ;;
-                esac
-        fi
+	if [ ! -f /source/${SYNO_KERNEL_SOURCE_DIR}/.config ]; then
+			case "$BUILD_TARGET" in
+					PPC_QORIQ)
+							echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/ppcQorIQ"
+							cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/ppcQorIQ    /source/${SYNO_KERNEL_SOURCE_DIR}/.config
+							;;
+					X64)
+							echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/x86_64"
+							cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/x86_64      /source/${SYNO_KERNEL_SOURCE_DIR}/.config
+							;;
+					BROMOLOWESM|BROMOLOW)
+							echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/bromolow"
+							cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/bromolow    /source/${SYNO_KERNEL_SOURCE_DIR}/.config
+							;;
+					BROADWELL|BROADWELLNK)
+							echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/broadwell"
+							cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/broadwell    /source/${SYNO_KERNEL_SOURCE_DIR}/.config
+							;;
+					BRASWELL)
+							echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/braswell"
+							cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/braswell    /source/${SYNO_KERNEL_SOURCE_DIR}/.config
+							;;
+					CEDARVIEW)
+							echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/cedarview"
+							cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/cedarview    /source/${SYNO_KERNEL_SOURCE_DIR}/.config
+							;;
+					MARVELL_88F6281)
+							echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/88f6281"
+							cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/88f6281     /source/${SYNO_KERNEL_SOURCE_DIR}/.config
+							;;
+					*)
+							echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/${PLATFORM_ABBR} for $BUILD_TARGET"
+							cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/$PLATFORM_ABBR /source/${SYNO_KERNEL_SOURCE_DIR}/.config
+							;;
+			esac
+	fi
 	echo "Entering /source/${SYNO_KERNEL_SOURCE_DIR}/"
 	cd /source/${SYNO_KERNEL_SOURCE_DIR}/
 	echo "Building modules"
