@@ -39,7 +39,7 @@ Install() {
 			exit 1
 			;;
 		*)
-			echo "${BUILD_TARGET} unsupported platform!"
+			echo "${BUILD_TARGET} unsupported platform! Using $PLATFORM_ABBR"
 			PLATFORM=$PLATFORM_ABBR
 			;;
 	esac
@@ -69,7 +69,7 @@ Install() {
 	
 	### update drivers for this version
 	echo "Update drivers in ./package/drivers/${PLATFORM}/${KERNEL}/ with ./package/opt/VirtualBox/src/vboxhost/*.ko"
-	[ ! -d  package/drivers/${PLATFORM}/${KERNEL} ] && mkdir  package/drivers/${PLATFORM}/${KERNEL}
+	[ ! -d  package/drivers/${PLATFORM}/${KERNEL} ] && mkdir -p package/drivers/${PLATFORM}/${KERNEL}
 	cp -f package/opt/VirtualBox/src/vboxhost/*.ko package/drivers/${PLATFORM}/${KERNEL}/
 	cp -r package/* "${INST_DIR}/"
 

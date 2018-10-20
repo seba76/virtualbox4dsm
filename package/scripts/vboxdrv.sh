@@ -97,7 +97,9 @@ start()
 			PLATFORM=x86_64
 		;;
 	esac
-
+	
+	echo "Loading driver from: ${PACKAGE_DIR}/target/drivers/${PLATFORM}/${KERNEL}"
+	
     # load vboxdrv
     insert_module vboxdrv vboxdrv "${PACKAGE_DIR}/target/drivers/${PLATFORM}/${KERNEL}"
     sleep 2
