@@ -13,6 +13,11 @@ if [ "${VBOXWEB_USER}" == "" ]; then
 	exit 0
 fi
 
+vboxdrvrunning() 
+{
+    lsmod | grep -q "vboxdrv[^_-]"
+}
+
 start()
 {
     echo "vboxinit starting VM's"
@@ -101,6 +106,11 @@ status()
 case "$1" in
 
 	start)
+        vboxdrvrunning || {
+            echo "VirtualBox kernel module not loaded, aborting!"
+            exit 4
+        }
+		
 		start
 		;;
 	stop)
