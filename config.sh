@@ -1,6 +1,6 @@
 #!/bin/sh 
-VirtualBoxVersion=5.2.16-123759
-VirtualBoxBase=http://download.virtualbox.org/virtualbox/5.2.16/
+VirtualBoxVersion=5.2.20-125813
+VirtualBoxBase=http://download.virtualbox.org/virtualbox/5.2.20/
 VirtualBoxFile=VirtualBox-${VirtualBoxVersion}-Linux_amd64.run
 ExtensionPackFile=Oracle_VM_VirtualBox_Extension_Pack-${VirtualBoxVersion}.vbox-extpack
 
