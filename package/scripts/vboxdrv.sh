@@ -93,6 +93,9 @@ start()
 		cedarview)
 			PLATFORM=cedarview
 		;;
+		avoton)
+			PLATFORM=avoton
+		;;
 		*)
 			PLATFORM=x86_64
 		;;

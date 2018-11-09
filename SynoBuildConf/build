@@ -74,6 +74,10 @@ if [ ! -f /source/${SYNO_KERNEL_SOURCE_DIR}/Module.symvers ]; then
 							echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/cedarview"
 							cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/cedarview    /source/${SYNO_KERNEL_SOURCE_DIR}/.config
 							;;
+					AVOTON)
+							echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/avoton"
+							cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/avoton    /source/${SYNO_KERNEL_SOURCE_DIR}/.config
+							;;
 					MARVELL_88F6281)
 							echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/88f6281"
 							cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/88f6281     /source/${SYNO_KERNEL_SOURCE_DIR}/.config

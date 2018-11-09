@@ -47,8 +47,9 @@ function prompt_for_source()
 		esac
 	done
 	
+	# when you add new platform you need to add it to build, install and vboxdrv.sh
 	PS3='Please select platform: '
-	options=("bromolow" "x64" "broadwell" "braswell" "cedarview" "Quit")
+	options=("bromolow" "x64" "broadwell" "braswell" "cedarview" "avoton" "Quit")
 	select opt in "${options[@]}"
 	do
 		case $opt in
@@ -70,6 +71,10 @@ function prompt_for_source()
 				;;
 			"cedarview")
 				DSM_PLAT=cedarview
+				break
+				;;
+			"avoton")
+				DSM_PLAT=avoton
 				break
 				;;
 			"Quit")
@@ -102,6 +107,10 @@ function prompt_for_source()
 				echo "Setting kernel download link for branch $DSM_BRANCH, $DSM_PLAT platform"
 				KernelTar=https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/15152branch/cedarview-source/linux-3.10.x.txz/download
 			;;
+			avoton)
+				echo "Setting kernel download link for branch $DSM_BRANCH, $DSM_PLAT platform"
+				KernelTar=https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/15152branch/avoton-source/linux-3.10.x.txz/download
+			;;
 			*)
 				echo "Unexpected platform: $DSM_PLAT";
 				exit 1
@@ -129,6 +138,10 @@ function prompt_for_source()
 			cedarview)
 				echo "Setting kernel download link for branch $DSM_BRANCH, $DSM_PLAT platform"
 				KernelTar=https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/22259branch/cedarview-source/linux-3.10.x.txz/download
+			;;
+			avoton)
+				echo "Setting kernel download link for branch $DSM_BRANCH, $DSM_PLAT platform"
+				KernelTar=https://sourceforge.net/projects/dsgpl/files/Synology%20NAS%20GPL%20Source/22259branch/avoton-source/linux-3.10.x.txz/download
 			;;
 			*)
 				echo "Unexpected platform: $DSM_PLAT";
