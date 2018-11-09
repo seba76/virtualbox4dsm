@@ -2,10 +2,10 @@
 
 # each line here is a dependent project
 [BuildDependent]
-linux-3.10.x
 
 [ReferenceOnly]
 # each line here is a project for reference only but no need to be built
+linux-3.10.x
 
 [default]
 all="6.1" 

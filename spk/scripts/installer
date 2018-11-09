@@ -188,7 +188,7 @@ postuninst ()
 preupgrade ()
 {
 	# stop service
-	"${PACKAGE_DIR}/target/scripts/start-stop-status" stop
+	"${PACKAGE_DIR}/scripts/start-stop-status" stop
 
 	# Save some stuff
 	rm -fr ${TMP_DIR}/${PACKAGE}
@@ -196,7 +196,7 @@ preupgrade ()
 
 	[ -f /etc/vbox/vbox.cfg ] && mv /etc/vbox/vbox.cfg ${TMP_DIR}/${PACKAGE}/
 	[ -f /etc/vbox/vboxwolservice.ini ] && mv /etc/vbox/vboxwolservice.ini ${TMP_DIR}/${PACKAGE}/
-	wizard_bind_ip=${/bin/get_key_value /etc/vbox/vbox.cfg VBOXWEB_HOST}
+	#wizard_bind_ip=$(/bin/get_key_value /etc/vbox/vbox.cfg VBOXWEB_HOST)
 	exit 0
 }
 

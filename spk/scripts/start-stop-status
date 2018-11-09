@@ -20,6 +20,7 @@ SCRIPTLOG="$TARGET_DIR/share/scripts.log"
 PIDFILE="$TARGET_DIR/wolsvc.pid"
 WOL="$PACKAGE_DIR/enabled_wol"
 
+HOME=/root
 
 start()
 {
@@ -69,7 +70,7 @@ stop()
 	"$TARGET_DIR/scripts/vboxdrv.sh" stop >> "${SCRIPTLOG}" 2>&1
 
 	# copy config to share
-	if [ -d $TARGET_DIR/share/ ]; then
+	if [ -d "${HOME}"/.config ]; then
 		cp -rf "${HOME}"/.config $TARGET_DIR/share/
 	fi
 	
@@ -101,7 +102,7 @@ case $1 in
 		# 3: package is not running
 		# 4: package status is unknown
 		# 150: package is broken and should be reinstalled. 
-		if [ $(ps aux | grep /opt/VirtualBox -c) == 4 ]; then 
+		if [ $(ps aux | grep -v VBoxHeadless | grep -e /opt/VirtualBox -c) == 4 ]; then 
 			exit 0
 		fi
 		
