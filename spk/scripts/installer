@@ -6,31 +6,9 @@ PACKAGE="virtualbox4dsm"
 # some variables
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PACKAGE_DIR="/var/packages/${PACKAGE}"
+CONFIG="${PACKAGE_DIR}/target/.config"
 VBOX_USER=root
 USER=${USER}
-
-# wizard variables
-VBOX_HTTPS=$([ "${wizard_use_https}" == "true" ] && echo "true" || echo "false")
-VBOX_ACTION="acpibutton"
-VBOX_ACTION=$([ "${wizard_on_stop_poweroff}" == "true" ] && echo "poweroff" || echo $VBOX_ACTION)
-VBOX_ACTION=$([ "${wizard_on_stop_acpibutton}" == "true" ] && echo "acpibutton" || echo $VBOX_ACTION)
-VBOX_ACTION=$([ "${wizard_on_stop_savestate}" == "true" ] && echo "savestate" || echo $VBOX_ACTION)
-SHARE_NAME="${wizard_virtualbox_share}"
-WEBSVC_BIND="${wizard_bind_ip}"
-WEBSVC_PASS="${wizard_use_vboxwebsvc_pass}"
-WEBSVC_PROTOCOL=$([ "${VBOX_HTTPS}" == "true" ] && echo "https" || echo "http")
-if [ "${WEBSVC_DOMAIN}" == "" ]; then
-  WEBSVC_URL="${WEBSVC_PROTOCOL}://${wizard_bind_ip}:18083"
-else
-  WEBSVC_URL="${WEBSVC_PROTOCOL}://${{wizard_vboxsvcdomain}:18083"
-fi
-
-# if bind to all fix url
-if [ "${WEBSVC_BIND}" == "0.0.0.0" ]; then
-  WEBSVC_URL="${WEBSVC_PROTOCOL}://127.0.0.1:18083"
-fi
-
-WOL_SVC=$([ "${wizard_enable_wol}" == "true" ]  && echo "true" || echo "false")
 
 # get dynamic stuff
 VOL_PATH=$(servicetool --get-alive-volume)
@@ -50,6 +28,40 @@ preinst ()
 
 postinst ()
 {
+	# wizard variables
+	VBOX_HTTPS=$([ "${wizard_use_https}" == "true" ] && echo "true" || echo "false")
+	VBOX_ACTION="acpibutton"
+	VBOX_ACTION=$([ "${wizard_on_stop_poweroff}" == "true" ] && echo "poweroff" || echo $VBOX_ACTION)
+	VBOX_ACTION=$([ "${wizard_on_stop_acpibutton}" == "true" ] && echo "acpibutton" || echo $VBOX_ACTION)
+	VBOX_ACTION=$([ "${wizard_on_stop_savestate}" == "true" ] && echo "savestate" || echo $VBOX_ACTION)
+	SHARE_NAME="${wizard_virtualbox_share}"
+	WEBSVC_BIND="${wizard_bind_ip}"
+	WEBSVC_PASS="${wizard_use_vboxwebsvc_pass}"
+	WEBSVC_PROTOCOL=$([ "${VBOX_HTTPS}" == "true" ] && echo "https" || echo "http")
+	if [ "${WEBSVC_DOMAIN}" == "" ]; then
+	  WEBSVC_URL="${WEBSVC_PROTOCOL}://${wizard_bind_ip}:18083"
+	else
+	  WEBSVC_URL="${WEBSVC_PROTOCOL}://${{wizard_vboxsvcdomain}:18083"
+	fi
+
+	# if bind to all fix url
+	if [ "${WEBSVC_BIND}" == "0.0.0.0" ]; then
+	  WEBSVC_URL="${WEBSVC_PROTOCOL}://127.0.0.1:18083"
+	fi
+
+	WOL_SVC=$([ "${wizard_enable_wol}" == "true" ]  && echo "true" || echo "false")
+
+	# save config
+	touch ${CONFIG}
+	set_key_value ${CONFIG} wizard_use_https ${wizard_use_https}
+	set_key_value ${CONFIG} wizard_on_stop_poweroff ${wizard_on_stop_poweroff}
+	set_key_value ${CONFIG} wizard_on_stop_acpibutton ${wizard_on_stop_acpibutton}
+	set_key_value ${CONFIG} wizard_on_stop_savestate ${wizard_on_stop_savestate}
+	set_key_value ${CONFIG} wizard_virtualbox_share ${wizard_virtualbox_share}
+	set_key_value ${CONFIG} wizard_bind_ip ${wizard_bind_ip}
+	set_key_value ${CONFIG} wizard_vboxsvcdomain ${wizard_vboxsvcdomain}
+	set_key_value ${CONFIG} wizard_enable_wol ${wizard_enable_wol}
+	
 	#create shared folder if needed
 	synoshare --get ${SHARE_NAME} > /dev/null 2>&1
 	if [ $? -ne 0 ]
@@ -61,7 +73,7 @@ postinst ()
 	# lets create link to share path
 	SHARE_PATH=$(synoshare --get virtualbox | grep 'Path' | cut -d[ -f2 | cut -d] -f1)
 	ln -sf ${SHARE_PATH} "${PACKAGE_DIR}/target/share"
-	echo "SHARE_PATH=${SHARE_PATH}" > "${PACKAGE_DIR}/target/.config"
+	set_key_value ${CONFIG} SHARE_PATH ${SHARE_PATH}
 
 	if [ ! -d ${SHARE_PATH} ]; then
 		echo "Share folder '${SHARE_PATH}' doesn't exist!"
@@ -156,7 +168,7 @@ preuninst ()
 		#/usr/syno/bin/servicetool --remove-configure-file --package virtualbox.sc
 
 		# stop service
-		"${PACKAGE_DIR}/target/scripts/start-stop-status" stop		
+		"${PACKAGE_DIR}/scripts/start-stop-status" stop		
 	fi
 
     exit 0
@@ -185,18 +197,21 @@ postuninst ()
     exit 0
 }
 
+
 preupgrade ()
 {
 	# stop service
 	"${PACKAGE_DIR}/scripts/start-stop-status" stop
 
 	# Save some stuff
-	rm -fr ${TMP_DIR}/${PACKAGE}
+	[ -d ${TMP_DIR}/${PACKAGE} ] && rm -fr ${TMP_DIR}/${PACKAGE}
 	mkdir -p ${TMP_DIR}/${PACKAGE}
 
 	[ -f /etc/vbox/vbox.cfg ] && mv /etc/vbox/vbox.cfg ${TMP_DIR}/${PACKAGE}/
 	[ -f /etc/vbox/vboxwolservice.ini ] && mv /etc/vbox/vboxwolservice.ini ${TMP_DIR}/${PACKAGE}/
-	#wizard_bind_ip=$(/bin/get_key_value /etc/vbox/vbox.cfg VBOXWEB_HOST)
+	[ -f CONFIG ] && cp CONFIG ${TMP_DIR}/${PACKAGE}/
+	[ -d ${PACKAGE_DIR}/target/share/.config/VirtualBox ] && cp -rf ${PACKAGE_DIR}/target/share/.config/VirtualBox ${TMP_DIR}/${PACKAGE}/ 
+	
 	exit 0
 }
 
@@ -205,14 +220,21 @@ postupgrade ()
 	# Restore some stuff
 	[ -f ${TMP_DIR}/${PACKAGE}/vbox.cfg ] && mv ${TMP_DIR}/${PACKAGE}/vbox.cfg /etc/vbox/vbox.cfg
 	[ -f ${TMP_DIR}/${PACKAGE}/vboxwolservice.ini ] && mv ${TMP_DIR}/${PACKAGE}/vboxwolservice.ini /etc/vbox/vboxwolservice.ini
-	rm -fr ${TMP_DIR}/${PACKAGE}
 
+	if [ -d ${TMP_DIR}/${PACKAGE}/VirtualBox ]; then
+		[ ! -d ${HOME}/.config ] && mkdir -p ${HOME}/.config
+		cp -rf ${TMP_DIR}/${PACKAGE}/VirtualBox ${HOME}/.config
+	fi 
+
+	rm -fr ${TMP_DIR}/${PACKAGE}
+	
 	# start service
-	"${PACKAGE_DIR}/target/scripts/start-stop-status" start
+	"${PACKAGE_DIR}/scripts/start-stop-status" start
 
 	exit 0
 }
 
+# get_key_value is in bin dir i.e. "get_key_value xfile key"
 set_key_value() {
 	xfile="$1"
 	param="$2"

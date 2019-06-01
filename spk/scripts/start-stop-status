@@ -32,8 +32,9 @@ start()
 	fi
 
 	# copy conf from share
-	if [ -d $TARGET_DIR/share/.config ]; then
-		cp -rf $TARGET_DIR/share/.config ${HOME}
+	if [ -d $TARGET_DIR/share/.config/VirtualBox ]; then
+		[ ! -d ${HOME}/.config ] && mkdir -p ${HOME}/.config
+		cp -rf $TARGET_DIR/share/.config/VirtualBox ${HOME}/.config
 	fi
 
 	# load drivers
@@ -70,8 +71,9 @@ stop()
 	"$TARGET_DIR/scripts/vboxdrv.sh" stop >> "${SCRIPTLOG}" 2>&1
 
 	# copy config to share
-	if [ -d "${HOME}"/.config ]; then
-		cp -rf "${HOME}"/.config $TARGET_DIR/share/
+	if [ -d "${HOME}"/.config/VirtualBox ]; then
+		[ ! -d $TARGET_DIR/share/.config/ ] && mkdir -p $TARGET_DIR/share/.config/
+		cp -rf "${HOME}"/.config/VirtualBox $TARGET_DIR/share/.config/
 	fi
 	
 	echo "**** Stop finished at $(date) ****" >> "${SCRIPTLOG}" 2>&1

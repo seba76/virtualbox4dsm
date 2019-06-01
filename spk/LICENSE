@@ -8,5 +8,8 @@ RESULTING FROM INSTALLING THIS PACKAGE!
 
 CHANGELOG 
 ===== 
+Version: 6.0.8-130520 
+Improved upgrade process, fixed few install bugs
+
 Version: 5.2.16-123759
 First version of virtualbox4dsm

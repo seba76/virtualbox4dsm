@@ -2,7 +2,7 @@
 [ -f /pkgscripts/include/pkg_util.sh ] && . /pkgscripts/include/pkg_util.sh
 [ -f /pkgscripts-ng/include/pkg_util.sh ] && . /pkgscripts-ng/include/pkg_util.sh
 package="virtualbox4dsm"
-version="5.2.20-125813"
+version="6.0.8-130520"
 displayname="VirtualBox"
 maintainer="seba"
 maintainer_url="http://github.com/seba76/"

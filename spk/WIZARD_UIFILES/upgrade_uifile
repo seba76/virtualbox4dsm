@@ -1,0 +1,67 @@
+[{
+    "step_title": "VirtualBox configuration (page 1 of 2)",
+    "items": [{
+        "type": "singleselect",
+        "desc": "On DSM shutdown what to do with running Guest VM?",
+        "subitems": [{
+			"key": "wizard_on_stop_poweroff",
+			"desc": "poweroff",
+			"defaultValue": false }, {
+			"key": "wizard_on_stop_acpibutton",
+			"desc": "acpibutton",
+			"defaultValue": true }, {
+			"key": "wizard_on_stop_savestate",
+			"desc": "savestate",
+			"defaultValue": false
+			}]
+    }, 
+    {
+		"type": "textfield",
+		"desc": "Shared folder for VirtualBox VMs (e.g. virtualbox) will be created on first live volume.",
+		"subitems": [{
+				"key": "wizard_virtualbox_share",
+				"desc": "Shared folder",
+				"defaultValue": "virtualbox"
+		}]
+    }]
+},
+{
+    "step_title": "VirtualBox configuration (page 2 of 2)",
+    "items": [
+    {
+		"type": "textfield",
+		"desc": "Vboxwebsrv SOAP service bind IP (not phpVirtualBox's URL)",
+		"subitems": [{
+				"key": "wizard_bind_ip",
+				"desc": "Bind to IP",
+				"defaultValue": "127.0.0.1"
+		}]
+    },
+	{
+        "type": "multiselect",
+        "desc": "Should vboxwebsrv use HTTPS protocol (useful if bind IP is not 127.0.0.1).",
+        "subitems": [{
+                        "key": "wizard_use_https",
+                        "desc": "Use HTTPS",
+                        "defaultValue": "false"
+        }]
+    },
+    {
+		"type": "textfield",
+		"desc": "Authentication password for vboxwebsrv , used if bind IP is not 127.0.0.1",
+		"subitems": [{
+				"key": "wizard_use_vboxwebsvc_pass",
+				"desc": "vboxwebsvc password",
+				"defaultValue": "B24Lq3OfG24S"
+		}]
+    },
+    {
+        "type": "multiselect",
+        "desc": "Enable WOL for guest VM's, you will be able to wake VM by sending standard magic packet to port 9 and VM's MAC address",
+        "subitems": [{
+                        "key": "wizard_enable_wol",
+                        "desc": "Enable WOL for VM",
+                        "defaultValue": "false"
+        }]
+    }]
+}]

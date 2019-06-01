@@ -17,3 +17,9 @@ or some other application like VBoxManage for Android.
 - Other virtualization applications have to be un-installed (like VMM), otherwise you can lose access to your box.
 - Control Panel -> Network -> Network Interface -> Manage -> Open vSwitch Settings -> Enable Open vSwitch 
 	- must be unchecked.
+
+## Contributing
+
+If you find this project useful you can mark it by leaving a Github **\*Star**.</br>
+If you would like to support the Project and help me buy new Synology box by making a Donation ($10) *#BuyMeBeer*, you are welcome to do so:<br>
+[![Donate](https://img.shields.io/badge/donate-PayPal-yellow.svg)](https://paypal.me/seba76/10)
