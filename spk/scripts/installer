@@ -110,6 +110,9 @@ postinst ()
 	[ ! -L "/lib64/libz.so" ] && ln -s /lib64/libz.so.1.2.8 /lib64/libz.so
 	[ ! -L "/lib64/libz.so.1" ] && ln -s /lib64/libz.so.1.2.8 /lib64/libz.so.1
 
+	# create udev rules for usb
+	[ -d /lib/udev/rules.d ] && cp "${PACKAGE_DIR}"/target/etc/virtualbox.rules /lib/udev/rules.d && udevadm control --reload
+	
 	# Create a default configuration file for VirtualBox
 	if [ ! -d "/etc/vbox" ]; then
 		cp -rf "${INSTALL_DIR}"/etc/vbox /etc/
@@ -190,6 +193,9 @@ postuninst ()
 			rmdir /opt
 		fi
 	fi
+
+	# remove udev rules
+	[ -f /lib/udev/rules.d/virtualbox.rules ] && rm /lib/udev/rules.d/virtualbox.rules && udevadm control --reload
 
 	# remove configuration (old one should be in share)
 	rm -rf /root/.config/VirtualBox

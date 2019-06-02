@@ -1,0 +1,4 @@
+SUBSYSTEM=="usb_device", ACTION=="add", RUN+="/opt/VirtualBox/VBoxCreateUSBNode.sh $major $minor $attr{bDeviceClass} 0"
+SUBSYSTEM=="usb", ACTION=="add", ENV{DEVTYPE}=="usb_device", RUN+="/opt/VirtualBox/VBoxCreateUSBNode.sh $major $minor $attr{bDeviceClass} 0"
+SUBSYSTEM=="usb_device", ACTION=="remove", RUN+="/opt/VirtualBox/VBoxCreateUSBNode.sh --remove $major $minor"
+SUBSYSTEM=="usb", ACTION=="remove", ENV{DEVTYPE}=="usb_device", RUN+="/opt/VirtualBox/VBoxCreateUSBNode.sh --remove $major $minor"
