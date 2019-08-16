@@ -10,7 +10,7 @@ su_command="su - ${VBOXWEB_USER} -s /bin/sh -c"
 # Enable/disable service
 if [ "${VBOXWEB_USER}" == "" ]; then
     echo "stop vm's is not enabled. add  VBOXWEB_USER="vbox" in /etc/vbox/vbox.cfg to enable"
-	exit 0
+    exit 1
 fi
 
 vboxdrvrunning() 
@@ -55,26 +55,28 @@ stop_vms()
         # don't create the ipcd directory with wrong permissions!
         if [ -d /tmp/.vbox-$i-ipc ]; then
             export VBOX_IPC_SOCKETID="$i"
-            VMS=`$VBOXMANAGE --nologo list runningvms | sed -e 's/^".*".*{\(.*\)}/\1/' 2>/dev/null`
+            VMS=`$VBOXMANAGE list runningvms | sed -e 's/^".*".*{\(.*\)}/\1/' 2>/dev/null`
             if [ -n "$VMS" ]; then
                 if [ "$SHUTDOWN" = "poweroff" ]; then
                     echo -n "Powering off remaining VMs"
                     for v in $VMS; do
-                        $VBOXMANAGE --nologo controlvm $v poweroff
+		        echo "poweroff for $v"
+                        $VBOXMANAGE controlvm $v poweroff
                     done
                     echo "... Done!"
                 elif [ "$SHUTDOWN" = "acpibutton" ]; then
                     echo -n "Sending ACPI power button event to remaining VMs"
                     for v in $VMS; do
                     	echo "acpipower for $v"
-                        $VBOXMANAGE --nologo controlvm $v acpipowerbutton
+                        $VBOXMANAGE controlvm $v acpipowerbutton
                         wait=60
                     done
                     echo "... Done!"
                 elif [ "$SHUTDOWN" = "savestate" ]; then
                     echo -n "Saving state of remaining VMs"
                     for v in $VMS; do
-                        $VBOXMANAGE --nologo controlvm $v savestate
+		        echo "savestate for $v"
+                        $VBOXMANAGE controlvm $v savestate
                     done
                     echo "... Done!"
                 fi
