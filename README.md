@@ -20,6 +20,6 @@ If all goes well you will have VirtualBox running. For remote management access 
 
 ## Contributing
 
-If you find this project useful you can mark it by leaving a Github **\*Star**.</br>
-If you would like to support the Project and help me buy new Synology box by making a Donation ($10) *#BuyMeBeer*, you are welcome to do so:<br>
-[![Donate](https://img.shields.io/badge/donate-PayPal-yellow.svg)](https://paypal.me/seba76/10)
+If you find this project useful you can mark it by leaving a Github *Star*.</br>
+Also if you like what I'we done and would like to support this Project consider making a Donation:<br>
+[![Donate](https://img.shields.io/badge/donate-PayPal-yellow.svg)](https://paypal.me/seba76/)
