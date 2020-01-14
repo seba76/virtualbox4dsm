@@ -4,6 +4,8 @@ This is build of VirtualBox app and service running on Synology NAS boxes with a
 
 Keep in mind installing this package can make your NAS unreachable since it is still in beta phase.
 
+For building an troubleshoting check Wiki pages.
+
 # Installation
 
 Latest spk file can be found in [release](https://github.com/seba76/virtualbox4dsm/releases). First you need to find out what arch your Synology NAS belongs to, you can
