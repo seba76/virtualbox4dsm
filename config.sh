@@ -1,6 +1,6 @@
 #!/bin/sh 
-VirtualBoxVersion=6.0.8-130520
-VirtualBoxBase=https://download.virtualbox.org/virtualbox/6.0.8/
+VirtualBoxVersion=6.1.4-136177
+VirtualBoxBase=https://download.virtualbox.org/virtualbox/6.1.4/
 VirtualBoxFile=VirtualBox-${VirtualBoxVersion}-Linux_amd64.run
 ExtensionPackFile=Oracle_VM_VirtualBox_Extension_Pack-${VirtualBoxVersion}.vbox-extpack
 
@@ -187,6 +187,22 @@ function generate_config()
   echo "ExtensionPackFile=${ExtensionPackFile}" >> .config
 }
 
+function generate_packge_config()
+{
+  if [ -f ../linux-3.10.x/Makefile ]; then
+    VERSION=$(awk "/^VERSION = / {print \$3}" ../linux-3.10.x/Makefile)
+    PATCHLEVEL=$(awk "/^PATCHLEVEL = / {print \$3}" ../linux-3.10.x/Makefile)
+    SUBLEVEL=$(awk "/^SUBLEVEL = / {print \$3}" ../linux-3.10.x/Makefile)
+	KVER=${VERSION}.${PATCHLEVEL}.${SUBLEVEL}
+    echo "Kernal version from Makefile ... ${KVER}"
+  else
+    KVER=3.10.105
+  fi
+
+  echo "Generating .config in package folder"
+  echo "KVER=${KVER}" > package/.config
+}
+
 function update_info()
 {
   echo "Update version in INFO.sh"
@@ -208,6 +224,7 @@ case $1 in
     download_vbox
     download_linux
     generate_config
+	generate_packge_config
     update_info
     update_vboxcfg
 	echo "Ready to exec:"
@@ -217,12 +234,14 @@ case $1 in
   clean)
     rm $VirtualBoxFile
     rm $ExtensionPackFile
+    rm -rf package/.config
     rm -rf package/www/phpvirtualbox
     rm .config
   ;;
   cleanall)
     rm $VirtualBoxFile
     rm $ExtensionPackFile
+    rm -rf package/.config
     rm -rf package/www/phpvirtualbox ../linux-3.10.x
     rm .config
   ;;

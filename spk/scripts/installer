@@ -14,11 +14,16 @@ USER=${USER}
 VOL_PATH=$(servicetool --get-alive-volume)
 KERNEL=$(uname -a | awk '{print $3}')
 DIST=$(uname -a | awk '{print $14}')
+KERNEL_BUILD_VER=$(get_key_value .config KVER)
+
+if [[ "${KERNEL_BUILD_VER}" == "" ]]; then
+	KERNEL_BUILD_VER=3.10.105
+fi
 
 preinst ()
 {
 	# check for supported kernel
-	if [[ ${KERNEL} != "3.10.105" ]]; then
+	if [[ ${KERNEL} != "${KERNEL_BUILD_VER}" ]]; then
 		echo "Kernel ${KERNEL} is not supported"
 		exit 1
 	fi
@@ -111,7 +116,7 @@ postinst ()
 	[ ! -L "/lib64/libz.so.1" ] && ln -s /lib64/libz.so.1.2.8 /lib64/libz.so.1
 
 	# create udev rules for usb
-	[ -d /lib/udev/rules.d ] && cp "${PACKAGE_DIR}"/target/etc/virtualbox.rules /lib/udev/rules.d && udevadm control --reload
+	[ -d /lib/udev/rules.d ] && cp "${PACKAGE_DIR}"/target/etc/50-virtualbox.rules /lib/udev/rules.d/ && udevadm control --reload
 	
 	# Create a default configuration file for VirtualBox
 	if [ ! -d "/etc/vbox" ]; then
@@ -195,7 +200,7 @@ postuninst ()
 	fi
 
 	# remove udev rules
-	[ -f /lib/udev/rules.d/virtualbox.rules ] && rm /lib/udev/rules.d/virtualbox.rules && udevadm control --reload
+	[ -f /lib/udev/rules.d/50-virtualbox.rules ] && rm /lib/udev/rules.d/50-virtualbox.rules && udevadm control --reload
 
 	# remove configuration (old one should be in share)
 	rm -rf /root/.config/VirtualBox
