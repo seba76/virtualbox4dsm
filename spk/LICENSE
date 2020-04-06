@@ -8,6 +8,10 @@ RESULTING FROM INSTALLING THIS PACKAGE!
 
 CHANGELOG 
 ===== 
+Version: 6.1.4-136177
+Improved upgrade process
+Changed udev rule file name
+
 Version: 6.0.8-130520 
 Improved upgrade process, fixed few install bugs
 
