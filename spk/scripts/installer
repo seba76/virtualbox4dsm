@@ -43,28 +43,16 @@ postinst ()
 	WEBSVC_BIND="${wizard_bind_ip}"
 	WEBSVC_PASS="${wizard_use_vboxwebsvc_pass}"
 	WEBSVC_PROTOCOL=$([ "${VBOX_HTTPS}" == "true" ] && echo "https" || echo "http")
-	if [ "${WEBSVC_DOMAIN}" == "" ]; then
-	  WEBSVC_URL="${WEBSVC_PROTOCOL}://${wizard_bind_ip}:18083"
-	else
-	  WEBSVC_URL="${WEBSVC_PROTOCOL}://${{wizard_vboxsvcdomain}:18083"
-	fi
-
-	# if bind to all fix url
-	if [ "${WEBSVC_BIND}" == "0.0.0.0" ]; then
-	  WEBSVC_URL="${WEBSVC_PROTOCOL}://127.0.0.1:18083"
-	fi
-
 	WOL_SVC=$([ "${wizard_enable_wol}" == "true" ]  && echo "true" || echo "false")
 
 	# save config
 	touch ${CONFIG}
-	set_key_value ${CONFIG} wizard_use_https ${wizard_use_https}
 	set_key_value ${CONFIG} wizard_on_stop_poweroff ${wizard_on_stop_poweroff}
 	set_key_value ${CONFIG} wizard_on_stop_acpibutton ${wizard_on_stop_acpibutton}
 	set_key_value ${CONFIG} wizard_on_stop_savestate ${wizard_on_stop_savestate}
 	set_key_value ${CONFIG} wizard_virtualbox_share ${wizard_virtualbox_share}
 	set_key_value ${CONFIG} wizard_bind_ip ${wizard_bind_ip}
-	set_key_value ${CONFIG} wizard_vboxsvcdomain ${wizard_vboxsvcdomain}
+	set_key_value ${CONFIG} wizard_use_https ${wizard_use_https}
 	set_key_value ${CONFIG} wizard_enable_wol ${wizard_enable_wol}
 	
 	#create shared folder if needed
@@ -148,6 +136,14 @@ postinst ()
 	# should enable WOL deamon
 	if [ "${WOL_SVC}" == "true" ]; then
 		touch ${PACKAGE_DIR}/enabled_wol
+		
+		# if bind to all fix url
+		if [ "${WEBSVC_BIND}" == "0.0.0.0" ]; then
+		  WEBSVC_URL="${WEBSVC_PROTOCOL}://127.0.0.1:18083"
+		else
+		  WEBSVC_URL="${WEBSVC_PROTOCOL}://${WEBSVC_BIND}:18083"
+		fi
+		
 		sed -i -e "s|@url@|${WEBSVC_URL}|g" "/etc/vbox/vboxwolservice.ini"			
 		
 		PWHASH=$("${PACKAGE_DIR}/target/wol/vboxwebclient.py" --hash ${WEBSVC_PASS})
