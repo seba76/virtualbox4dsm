@@ -7,11 +7,11 @@ Keep in mind installing this package can make your NAS unreachable since it is s
 For building an troubleshoting check Wiki pages.
 
 # Installation
-
-Latest spk file can be found in [release](https://github.com/seba76/virtualbox4dsm/releases). First you need to find out what arch your Synology NAS belongs to, you can
+First you need to find out what arch your Synology NAS belongs to, you can
 consult [here](https://www.synology.com/en-global/knowledgebase/DSM/tutorial/Compatibility_Peripherals/What_kind_of_CPU_does_my_NAS_have). Not all arch are supported.
 Once you know what arch you need download appropriate package for you Synology box and install it manually in package center. During installation you will be asked few questions. 
 If all goes well you will have VirtualBox running. For remote management access you will need PhpVirtualBox or some other application like VBoxManage for Android.
+Latest spk file can be found in the [release](https://github.com/seba76/virtualbox4dsm/releases) page.
 
 ## Requirements
 - This package will work only on Intel boxes.
