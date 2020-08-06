@@ -6,25 +6,41 @@ PACKAGE="virtualbox4dsm"
 # some variables
 INSTALL_DIR="/usr/local/${PACKAGE}"
 PACKAGE_DIR="/var/packages/${PACKAGE}"
-CONFIG="${PACKAGE_DIR}/target/.config"
+CONFIG="${PACKAGE_DIR}/target/etc/vbox4dsm.config"
 VBOX_USER=root
 USER=${USER}
 
 # get dynamic stuff
 VOL_PATH=$(servicetool --get-alive-volume)
-KERNEL=$(uname -a | awk '{print $3}')
-DIST=$(uname -a | awk '{print $14}')
-KERNEL_BUILD_VER=$(get_key_value .config KVER)
 
+# get kernel version and remove plus in kernel version if any
+KERNEL=$(uname -a | awk '{print $3}')
+KERNEL=${KERNEL//+}
+
+KERNEL_BUILD_VER=$(get_key_value ${CONFIG} KVER)
 if [[ "${KERNEL_BUILD_VER}" == "" ]]; then
-	KERNEL_BUILD_VER=3.10.105
+	KERNEL_BUILD_VER=3.10.5
 fi
+
+DIST=$(uname -a | awk '{print $14}')
+
 
 preinst ()
 {
+	# at this point in instalation package.tgz is not extracted
+	if [ -f ${SYNOPKG_PKGINST_TEMP_DIR}/etc/vbox4dsm.config ]; then
+		KERNEL_BUILD_VER=$(get_key_value ${SYNOPKG_PKGINST_TEMP_DIR}/etc/vbox4dsm.config KVER)
+	else
+		echo "No ${SYNOPKG_PKGINST_TEMP_DIR}/etc/vbox4dsm.config"
+	fi
+	
+	if [[ "${KERNEL_BUILD_VER}" == "" ]]; then
+		KERNEL_BUILD_VER=3.10
+	fi
+
 	# check for supported kernel
-	if [[ ${KERNEL} != "${KERNEL_BUILD_VER}" ]]; then
-		echo "Kernel ${KERNEL} is not supported"
+	if [[ "${KERNEL}" != "${KERNEL_BUILD_VER}" ]]; then
+		echo "Kernel '${KERNEL}' is not supported, supporting only '${KERNEL_BUILD_VER}'"
 		exit 1
 	fi
 
@@ -59,7 +75,7 @@ postinst ()
 	synoshare --get ${SHARE_NAME} > /dev/null 2>&1
 	if [ $? -ne 0 ]
 	then
- 		echo "Shared folder ${SHARE_NAME} doesn't exist"
+ 		echo "Shared folder '${SHARE_NAME}' doesn't exist"
 		exit 1
 	fi
 

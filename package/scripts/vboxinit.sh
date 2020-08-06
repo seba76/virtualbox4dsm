@@ -55,20 +55,20 @@ stop_vms()
         # don't create the ipcd directory with wrong permissions!
         if [ -d /tmp/.vbox-$i-ipc ]; then
             export VBOX_IPC_SOCKETID="$i"
-            VMS=`$VBOXMANAGE list runningvms | sed -e 's/^".*".*{\(.*\)}/\1/' 2>/dev/null`
+            VMS=`$vboxmanage list runningvms | sed -e 's/^".*".*{\(.*\)}/\1/' 2>/dev/null`
             if [ -n "$VMS" ]; then
                 if [ "$SHUTDOWN" = "poweroff" ]; then
                     echo -n "Powering off remaining VMs"
                     for v in $VMS; do
 		        echo "poweroff for $v"
-                        $VBOXMANAGE controlvm $v poweroff
+                        $vboxmanage controlvm $v poweroff
                     done
                     echo "... Done!"
                 elif [ "$SHUTDOWN" = "acpibutton" ]; then
                     echo -n "Sending ACPI power button event to remaining VMs"
                     for v in $VMS; do
                     	echo "acpipower for $v"
-                        $VBOXMANAGE controlvm $v acpipowerbutton
+                        $vboxmanage controlvm $v acpipowerbutton
                         wait=60
                     done
                     echo "... Done!"
@@ -76,7 +76,7 @@ stop_vms()
                     echo -n "Saving state of remaining VMs"
                     for v in $VMS; do
 		        echo "savestate for $v"
-                        $VBOXMANAGE controlvm $v savestate
+                        $vboxmanage controlvm $v savestate
                     done
                     echo "... Done!"
                 fi

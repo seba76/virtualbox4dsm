@@ -7,6 +7,9 @@ PKG_DEST="/image/packages"
 DATE=$(date +%Y%m%d) 
 SRC=$(pwd)
 
+# kernalver
+. ./build.config
+
 PrepareDirs() {
     for dir in $INST_DIR $PKG_DIR; do
         rm -rf "$dir"
@@ -34,6 +37,9 @@ Install() {
 		BROMOLOWESM|BROMOLOW)
 			PLATFORM="bromolow"
 			;;
+		DENVERTON)
+			PLATFORM="denverton"
+			;;
 		MARVELL_88F6281)
 			echo "MARVELL_88F6281 is unsupported platform!"
 			exit 1
@@ -44,38 +50,18 @@ Install() {
 			;;
 	esac
 	 
-	### what kernel version is this
-	case "${DSM_SHLIB_MAJOR}.${DSM_SHLIB_MINOR}" in
-		5.1)
-			KERNEL="3.2.40"
-			;;
-		5.2)
-			KERNEL="3.10.35"
-			;;
-		6.0)
-			KERNEL="3.10.77"
-			;;
-		6.1)
-			KERNEL="3.10.102"
-			;;
-		6.2)
-			KERNEL="3.10.105"
-			;;
-		*)
-			echo "${DSM_SHLIB_MAJOR}.${DSM_SHLIB_MINOR} unknown verion of DSM, can't guess kernel version"
-			exit 1
-			;;
-	esac
-	
 	### update drivers for this version
-	echo "Update drivers in ./package/drivers/${PLATFORM}/${KERNEL}/ with ./package/opt/VirtualBox/src/vboxhost/*.ko"
-	[ ! -d  package/drivers/${PLATFORM}/${KERNEL} ] && mkdir -p package/drivers/${PLATFORM}/${KERNEL}
-	cp -f package/opt/VirtualBox/src/vboxhost/*.ko package/drivers/${PLATFORM}/${KERNEL}/
+	echo "Update drivers in ./package/drivers/${PLATFORM}/${KVER}/ with ./package/opt/VirtualBox/src/vboxhost/*.ko"
+	rm -rf package/drivers/*
+	mkdir -p package/drivers/${PLATFORM}/${KVER}
+	cp -f package/opt/VirtualBox/src/vboxhost/*.ko package/drivers/${PLATFORM}/${KVER}/
+	
+	### colect package files
 	cp -r package/* "${INST_DIR}/"
 
 	# fix permissions
 	chown root:root ${INST_DIR} -R
-
+	
 	# remove some files to lighten installer
 	rm -rf "${INST_DIR}/opt/VirtualBox/src"
 	rm -f "${INST_DIR}/opt/VirtualBox/UserManual.pdf"
@@ -102,10 +88,12 @@ InstallSynologyConfig(){
 MakePackage() {
 	[ -f /pkgscripts/include/pkg_util.sh ] && source /pkgscripts/include/pkg_util.sh
 	[ -f /pkgscripts-ng/include/pkg_util.sh ] && source /pkgscripts-ng/include/pkg_util.sh
-	[ -f .config ] && source .config
+	[ -f build.config ] && source build.config
 
     ### fix permissions
     chown root:root $PKG_DIR/* -R
+	chmod 755 ${PKG_DIR}/scripts/*
+	chmod 755 ${PKG_DIR}/WIZARD_UIFILES/*	
 
     pkg_make_package $INST_DIR $PKG_DIR
     pkg_make_spk $PKG_DIR $PKG_DEST  ${PKG_NAME}-${PLATFORM}-${VirtualBoxVersion}.spk

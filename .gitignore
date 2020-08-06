@@ -3,7 +3,9 @@
 repack.sh
 *.vbox-extpack
 *.zip
+*.txz
 *.run
-.config
+build.config
+package/etc/vbox4dsm.config
 package/www/phpvirtualbox/
 

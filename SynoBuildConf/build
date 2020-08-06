@@ -8,8 +8,8 @@ case ${MakeClean} in
 	;;
 esac
 
-# url links and file names
-. ./.config
+# url links and file names, kernel version
+. ./build.config
 
 # check req files
 if [ ! -f ./${VirtualBoxFile} ]; then
@@ -78,6 +78,10 @@ if [ ! -f /source/${SYNO_KERNEL_SOURCE_DIR}/Module.symvers ]; then
 							echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/avoton"
 							cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/avoton    /source/${SYNO_KERNEL_SOURCE_DIR}/.config
 							;;
+					DENVETRTON)
+							echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/denverton"
+							cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/denverton    /source/${SYNO_KERNEL_SOURCE_DIR}/.config
+							;;
 					MARVELL_88F6281)
 							echo "Copying default .config from: /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/88f6281"
 							cp -f /source/${SYNO_KERNEL_SOURCE_DIR}/synoconfigs/88f6281     /source/${SYNO_KERNEL_SOURCE_DIR}/.config
@@ -97,4 +101,4 @@ fi
 
 cd ./package/opt/VirtualBox/src/vboxhost/
 #make ${MAKE_FLAGS} KERN_DIR=/source/${SYNO_KERNEL_SOURCE_DIR}/ ARCH=${ARCH} CROSS_COMPILE= 
-make ${MAKE_FLAGS} KSRC="$KSRC" CROSS_COMPILE="$CROSS_COMPILE" ARCH="$ARCH" KERN_DIR="$KSRC" KERN_VER=3.10.x
+make ${MAKE_FLAGS} KSRC="$KSRC" CROSS_COMPILE="$CROSS_COMPILE" ARCH="$ARCH" KERN_DIR="$KSRC" KERN_VER=$KVER

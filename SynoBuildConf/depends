@@ -3,9 +3,13 @@
 # each line here is a dependent project
 [BuildDependent]
 
-[ReferenceOnly]
+[ReferenceOnly:bromolow,x64,broadwell,braswell,cedarview,avoton]
 # each line here is a project for reference only but no need to be built
 linux-3.10.x
+
+[ReferenceOnly:denverton]
+# each line here is a project for reference only but no need to be built
+linux-4.4.x
 
 [default]
 all="6.1" 

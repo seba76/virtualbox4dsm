@@ -56,7 +56,7 @@ running()
 
 runningvm()
 {
-    VMS=`$VBOXMANAGE --nologo list runningvms | sed -e 's/^".*".*{\(.*\)}/\1/' 2>/dev/null`
+    VMS=`$VBOXMANAGE list runningvms | sed -e 's/^".*".*{\(.*\)}/\1/' 2>/dev/null`
     if [ ! "$VMS" == "" ]; then
         return 0
     fi
@@ -79,7 +79,13 @@ start()
 
 	# determine on what platform we are running
 	KERNEL=$(uname -a | awk '{print $3}')
-	DIST=$(uname -a | awk '{print $14}' | awk '{split($0,a,"_"); print a[2]}')
+	KERNEL=${KERNEL//+}
+	#DIST=$(uname -a | awk '{print $14}' | awk '{split($0,a,"_"); print a[2]}')
+	DIST=$(get_key_value /etc/synoinfo.conf synobios)
+	if [ "$DIST" = "" ]; then
+		DIST=$(uname -a | awk '{print $15}' | awk '{split($0,a,"_"); print a[2]}')
+	fi
+	
 	case $DIST in
 		bromolow)
 			PLATFORM=bromolow
@@ -95,6 +101,9 @@ start()
 		;;
 		avoton)
 			PLATFORM=avoton
+		;;
+		denverton)
+			PLATFORM=denverton
 		;;
 		*)
 			PLATFORM=x86_64
@@ -140,7 +149,10 @@ start()
     # load other modules
     insert_module vboxnetflt vboxnetflt "${PACKAGE_DIR}/target/drivers/${PLATFORM}/${KERNEL}"
     insert_module vboxnetadp vboxnetadp "${PACKAGE_DIR}/target/drivers/${PLATFORM}/${KERNEL}"
-    insert_module vboxpci vboxpci "${PACKAGE_DIR}/target/drivers/${PLATFORM}/${KERNEL}"
+	if [ -f "${PACKAGE_DIR}/target/drivers/${PLATFORM}/${KERNEL}" ]; then
+		# vboxpci (PCI passthrough) was dropped in 6.1
+		insert_module vboxpci vboxpci "${PACKAGE_DIR}/target/drivers/${PLATFORM}/${KERNEL}"
+	fi
 
     # Create the /dev/vboxusb directory if the host supports that method
     # of USB access.  The USB code checks for the existence of that path.
@@ -155,7 +167,10 @@ start()
 stop()
 {
     echo "Stopping VirtualBox kernel modules"
-    remove_module vboxpci vboxpci
+	if [ -f "${PACKAGE_DIR}/target/drivers/${PLATFORM}/${KERNEL}" ]; then
+		remove_module vboxpci vboxpci
+	fi
+	
     remove_module vboxnetadp vboxnetadp
     remove_module vboxnetflt vboxnetflt
     remove_module vboxdrv vboxdrv

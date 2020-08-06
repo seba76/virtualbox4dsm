@@ -2,7 +2,7 @@
 [ -f /pkgscripts/include/pkg_util.sh ] && . /pkgscripts/include/pkg_util.sh
 [ -f /pkgscripts-ng/include/pkg_util.sh ] && . /pkgscripts-ng/include/pkg_util.sh
 package="virtualbox4dsm"
-version="6.1.4-136177"
+version="6.1.12-139181"
 displayname="VirtualBox"
 maintainer="seba"
 maintainer_url="http://github.com/seba76/"
@@ -15,7 +15,6 @@ thirdparty="true"
 support_conf_folder="yes"
 #support_aaprofile="yes"
 #install_reboot="yes"
-changelog="Version: 5.1.28-114008"
 #reloadui="yes"
 displayname="VirtualBox"
 if [ "$(pkg_get_platform)" == "x86" ]; then
