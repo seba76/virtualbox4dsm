@@ -1,3 +1,6 @@
+[![Github All Releases](https://img.shields.io/github/downloads/seba76/virtualbox4dsm/total.svg)](https://github.com/seba76/virtualbox4dsm)
+[![Paypal](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://paypal.me/seba76/)
+___
 # virtualbox4dsm
 
 This is build of VirtualBox app and service running on Synology NAS boxes with appropriate Intel CPU. This repo doesn't contain GUI for that head to [phpvirtualbox4dsm](https://github.com/seba76/phpvirtualbox4dsm).
@@ -24,5 +27,4 @@ Latest spk file can be found in the [release](https://github.com/seba76/virtualb
 ## Contributing
 
 If you find this project useful you can mark it by leaving a Github *Star*.</br>
-Also if you like what I'we done and would like to support this Project consider making a Donation:<br>
-[![Donate](https://img.shields.io/badge/donate-PayPal-yellow.svg)](https://paypal.me/seba76/)
+In case you have a problem installing open an issue with info about version of DSM and HW model you are using with erorr messages if any.
